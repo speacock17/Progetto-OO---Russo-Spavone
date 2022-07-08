@@ -22,6 +22,7 @@ import Entità.Produttore;
 import Entità.Utente;
 
 
+
 public class ListaProduttoreGui 
 {
 	private JPanel contentPane;
