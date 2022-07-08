@@ -30,4 +30,5 @@ public class ControllerProduttore
 	{
 		pr.InserisciProduttore(nomeUtente, Password, nomeProd);
 	}
+	
 }
