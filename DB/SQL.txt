@@ -1,0 +1,3652 @@
+--DEFINIZIONE TABELLE
+
+Create type Piano as enum
+(
+  'Standard','Gold','Platinum','Studenti'
+);
+
+Create type Fascia as enum
+(
+  '00-06','06-12','12-18','18-24'
+);
+
+Create type Accesso as enum 
+( 
+  'Admin', 'Client'
+);
+
+
+Create table Utente
+(
+  IdUtente integer NOT NULL,
+  NomeUtente varchar(30) NOT NULL,
+  Password varchar(16) NOT NULL,
+  Mail varchar(40) NOT NULL,
+  Nome varchar(20) NOT NULL,
+  Cognome varchar(20) NOT NULL,
+  Nazione varchar(20) NOT NULL,
+  Piano Piano NOT NULL,
+  Accesso Accesso NOT NULL DEFAULT 'Client',
+  CONSTRAINT controllo_password CHECK(Length(Password)>=6),
+  CONSTRAINT controllo_mail CHECK(Mail LIKE '_%@_%.__%'),
+  CONSTRAINT unique_nome_utente UNIQUE(NomeUtente),
+  CONSTRAINT unique_mail UNIQUE(Mail),
+  CONSTRAINT pk_utente PRIMARY KEY(IdUtente)
+);
+
+
+Create table Artista
+(
+  IdArtista integer NOT NULL,
+  Nome varchar(20) NOT NULL,
+  Nazione varchar(20) NOT NULL,
+  Etichetta varchar(40),
+  CONSTRAINT pk_artista PRIMARY KEY(IdArtista)
+);
+
+
+Create table Produttore
+(
+  IdProd integer NOT NULL,
+  Nome varchar(20) NOT NULL,
+  CONSTRAINT unique_prod UNIQUE(Nome),
+  CONSTRAINT pk_prod PRIMARY KEY(IdProd)
+);
+
+
+Create table Album
+(
+  IdAlbum integer NOT NULL,
+  Titolo varchar(40) NOT NULL,
+  Anno integer NOT NULL,
+  Produttore  integer,
+  CONSTRAINT pk_album PRIMARY KEY(IdAlbum),
+  CONSTRAINT annominalbum CHECK (anno<=DATE_PART('year',current_date)),
+  CONSTRAINT fk_album_prod FOREIGN KEY (Produttore) REFERENCES Produttore(IdProd)
+	ON UPDATE CASCADE
+	ON DELETE SET NULL
+);
+
+
+Create table ArtistaAlbum
+(
+  IdAlbum integer NOT NULL,
+  IdArtista integer NOT NULL,
+  CONSTRAINT unique_artistaalbum UNIQUE(idalbum,idartista),
+  CONSTRAINT fk_ArtistaAlbum_album FOREIGN KEY (IdAlbum) REFERENCES Album(IdAlbum)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+  CONSTRAINT fk_ArtistaAlbum_artista FOREIGN KEY (IdArtista) REFERENCES Artista(IdArtista)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+);
+
+
+Create table Traccia
+(
+  IdTraccia integer NOT NULL,
+  Titolo varchar(30) NOT NULL,
+  Durata integer NOT NULL,
+  Anno integer NOT NULL,
+  Genere varchar(15),
+  Versione integer NOT NULL DEFAULT '1',
+  QualitàAudio varchar(20) NOT NULL DEFAULT 'Base',
+  Tipo varchar(20) NOT NULL DEFAULT 'Original',
+  Accesso Piano NOT NULL DEFAULT 'Standard',
+  PercentualeProd integer NOT NULL DEFAULT '0',
+  Album integer NOT NULL,
+  CONSTRAINT pk_traccia PRIMARY KEY(IdTraccia),
+  CONSTRAINT fk_traccia_album FOREIGN KEY (Album) REFERENCES Album(IdAlbum)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+  CONSTRAINT annomintraccia CHECK (anno<=DATE_PART('year',current_date)),
+  CONSTRAINT check_durata CHECK (Durata>0),
+  CONSTRAINT check_versione CHECK (Versione>0),
+  CONSTRAINT check_percentuale CHECK(PercentualeProd>=0),
+  CONSTRAINT unique_traccia UNIQUE(Titolo,Album)
+);
+
+
+Create table TracciaArtista
+(
+  Traccia integer NOT NULL,
+  Artista integer NOT NULL,
+  CONSTRAINT unique_tracciaartista UNIQUE(traccia, artista),
+  CONSTRAINT fk_TracciaArtista_traccia FOREIGN KEY (Traccia) REFERENCES Traccia(IdTraccia)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+  CONSTRAINT fk_TracciaArtista_artista FOREIGN KEY (Artista) REFERENCES Artista(IdArtista)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+);
+
+
+Create table Featuring
+(
+  Traccia integer NOT NULL,
+  ArtistaOspite integer NOT NULL,
+  CONSTRAINT unique_featuring UNIQUE(traccia,artistaospite),
+  CONSTRAINT fk_Featuring_traccia FOREIGN KEY (Traccia) REFERENCES Traccia(IdTraccia)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+  CONSTRAINT fk_Featuring_artistaospite FOREIGN KEY (ArtistaOspite) REFERENCES Artista(IdArtista)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+);
+
+
+Create table TracceDerivate
+(
+  Derivata integer NOT NULL,
+  Originale integer,
+  CONSTRAINT unique_derivate UNIQUE(derivata,originale),
+  CONSTRAINT fk_derivata FOREIGN KEY (Derivata) REFERENCES Traccia(IdTraccia)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+  CONSTRAINT fk_originale FOREIGN KEY (Originale) REFERENCES Traccia(IdTraccia)
+	ON UPDATE CASCADE
+	ON DELETE SET NULL
+);
+
+
+Create table Riproduzione
+(
+  IdRiprod integer NOT NULL,
+  Utente integer,
+  Traccia integer NOT NULL,
+  FasciaOraria Fascia NOT NULL,
+  CONSTRAINT pk_riproduzione PRIMARY KEY(IdRiprod),
+  CONSTRAINT fk_riproduzione_utente FOREIGN KEY (Utente) REFERENCES Utente(IdUtente)
+	ON UPDATE CASCADE
+	ON DELETE SET NULL,
+  CONSTRAINT fk_riproduzione_traccia FOREIGN KEY (Traccia) REFERENCES Traccia(IdTraccia)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+);
+
+
+Create table BraniPreferiti
+(
+  Utente integer NOT NULL,
+  Traccia integer NOT NULL,
+  CONSTRAINT unique_branipreferiti UNIQUE(utente, traccia),
+  CONSTRAINT fk_branipreferiti_utente FOREIGN KEY (Utente) REFERENCES Utente(IdUtente)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+  CONSTRAINT fk_branipreferiti_traccia FOREIGN KEY (Traccia) REFERENCES Traccia(IdTraccia)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+);
+
+
+CREATE SEQUENCE codtraccia
+	START 1
+	INCREMENT 1
+	OWNED BY Traccia.IdTraccia;
+
+CREATE SEQUENCE codutente
+	START 1
+	INCREMENT 1
+	OWNED BY Utente.IdUtente;
+
+CREATE SEQUENCE codalbum
+	START 1
+	INCREMENT 1
+	OWNED BY Album.IdAlbum;
+
+CREATE SEQUENCE codartista
+	START 1
+	INCREMENT 1
+	OWNED BY Artista.IdArtista;
+
+CREATE SEQUENCE codprod
+	START 1
+	INCREMENT 1
+	OWNED BY Produttore.IdProd;
+
+CREATE SEQUENCE codrip
+	START 1
+	INCREMENT 1
+	OWNED BY Riproduzione.IdRiprod;
+
+
+--INSERIMENTI
+
+insert into utente 
+values(nextval('codutente'),'stefano01','Ospina25','spezzella63@gmail.com','Stefano','Pezzella','Italia','Platinum', 'Admin');
+
+insert into utente  
+values(nextval('codutente'),'alessandro99','DiLorenzo22','alessandrorusso601@gmail.com','Alessandro','Russo','Italia','Platinum', 'Admin');
+
+insert into utente  
+values(nextval('codutente'),'matteospa01','Koulibaly26','spavonematteo@gmail.com','Matteo','Spavone','Italia','Platinum', 'Admin');
+
+insert into utente  
+values(nextval('codutente'),'silviobarra00','Ribery7','silvio.barra@unina.it','Silvio','Barra','Italia','Platinum', 'Admin');
+
+insert into utente  
+values(nextval('codutente'),'tramontana00','insigne24','tramontana@unina.it','Porfirio','Tramontana','Italia','Platinum', 'Admin');
+
+insert into utente  
+values(nextval('codutente'),'renatoantonelli01','MarioRui6','renatoantonelli01@gmail.com','Renato','Antonelli','Italia','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'alexsia26','Fabian8','adicostanzo26@gmail.com','Alessandra','Di Costanzo','Italia','Standard');
+
+insert into utente  
+values(nextval('codutente'),'lollojudokboy','Anguissa99','lorenzocriscuolo@gmail.com','Lorenzo','Criscuolo','Italia','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'mafiox','Lozano11','mariomolinaro@gmail.com','Mario','Molinaro','Italia','Gold');
+
+insert into utente  
+values(nextval('codutente'),'thomas9spa','Mertens14','thomas9spa@tiscali.it','Thomas','Spavone','Italia','Standard');
+
+insert into utente  
+values(nextval('codutente'),'giuliagrasso0880','Osimhen9','giuliagrasso0880@libero.it','Giulia','Grasso','Italia','Standard');
+
+insert into utente  
+values(nextval('codutente'),'michealsmith0295','dkxj83yrus','michealsmith0295@gmail.com','Micheal','Smith','USA','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'rickjhonson0387','jdhx63yrijd','rickjhonson0387@outlook.com','Rick','Jhonson','USA','Gold');
+
+insert into utente  
+values(nextval('codutente'),'paulwilliams0781','hdgtcv2dj','paulwilliams0781@outlook.com','Paul','Williams','USA','Standard');
+
+insert into utente  
+values(nextval('codutente'),'aliciabrown1294','jfhdu4tosx','aliciabrown1294@gmail.com','Alicia','Brown','USA','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'carmengarcia0175','jghfurie8d','carmengarcia0175@mail.com','Carmen','Garcia','USA','Standard');
+
+insert into utente  
+values(nextval('codutente'),'jasminelopez1196','qwuf75420o','jasminelopez1196@gmail.com','Jasmine','Lopez','USA','Gold');
+
+insert into utente  
+values(nextval('codutente'),'jhonwalker0172','lapoer56tg','jhonwalker0172@outlook.com','Jhon','Walker','Inghilterra','Standard');
+
+insert into utente  
+values(nextval('codutente'),'lucasthomson0274','jdis98345uf','lucasthomson@outlook.com','Lucas','Thomson','Inghilterra','Standard');
+
+insert into utente  
+values(nextval('codutente'),'rickgreen1280','fhd8iwp2of','rickgreen1280@gmail.com','Rick','Green','Inghilterra','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'jameshall0965','hdusy7e64l','jameshall0965@outlook.com','James','Hall','Inghilterra','Gold');
+
+insert into utente  
+values(nextval('codutente'),'calvinharris0204','adhfuco883d','calvinharris0204@mail.com','Calvin','Harris','Inghilterra','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'nickwood0599','djfcie8rtf','nickwood0599@outlook.com','Nick','Wood','Inghilterra','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'michelbernard0193','ajde387cgf','michelbernard0193@gmail.com','Michel','Bernard','Francia','Gold');
+
+insert into utente  
+values(nextval('codutente'),'marierobert0296','kdjcirope93','marierobert0296@outlook.com','Marie','Robert','Francia','Standard');
+
+insert into utente  
+values(nextval('codutente'),'nathalielaurent1101','lfhcud93od','nathalielaurent1101@outlook.com','Nathalie','Laurent','Francia','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'danielsimon0584','mdieprof94','danielsimon@gmail.com','Daniel','Simon','Francia','Standard');
+
+insert into utente  
+values(nextval('codutente'),'patrickgarcia0180','zfu874yfsd','patrickgarcia0180@gmail.com','Patrick','Garcia','Francia','Gold');
+
+insert into utente  
+values(nextval('codutente'),'chantalsebastien0897','xduf873ryf','chantalsebastien0897@outlook.com','Chantal','Sebastien','Francia','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'andreasmuller0581','hfury3629a','andreasmuller0581@outlook.com','Andreas','Muller','Germania','Standard');
+
+insert into utente  
+values(nextval('codutente'),'anjashmidt0993','aloe48rutb','anjashmidt0993@gmail.com','Anja','Shmidt','Germania','Gold');
+
+insert into utente  
+values(nextval('codutente'),'barbaraweber1295','adi873eryc','barbaraweber1295@outlook.com','Barbara','Weber','Germania','Standard');
+
+insert into utente  
+values(nextval('codutente'),'franckshulz0385','ldk7yr8ids','franckshulz0385@gmx.com','Franck','Shulz','Germania','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'juliabauer1098','ldksi34ufv','juliabauer1098@gmx.com','Julia','Bauer','Germania','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'markwolf0292','xcvhf765rd','markwolf0292@gmail.com','Mark','Wolf','Germania','Standard');
+
+insert into utente  
+values(nextval('codutente'),'antoniogarcia1193','kfjchxs8r','antoniogarcia1193@outlook.com','Antonio','Garcia','Spagna','Standard');
+
+insert into utente  
+values(nextval('codutente'),'mariarodriguez0899','jd83tpw0xs','mariarodriguez0899@gmail.com','Maria','Rodriguez','Spagna','Gold');
+
+insert into utente  
+values(nextval('codutente'),'manuellopez0291','kdlso982yr','manuellopez0291@gmail.com','Manuel','Lopez','Spagna','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'isabelruiz0302','laow02erdx','isabelruiz0302@outlook.com','Isabel','Ruiz','Spagna','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'carlosmoreno0278','alo02ertfd','carlosmoreno0278@gmail.com','Carlos','Moreno','Spagna','Standard');
+
+insert into utente  
+values(nextval('codutente'),'martaalvarez0496','also1288dc','martaalvarez0496@gmail.com','Marta','Alvarez','Spagna','Gold');
+
+insert into utente  
+values(nextval('codutente'),'lindajansen0492','ksc73ertcs','lindajansen0492@outlook.com','Linda','Jansen','Olanda','Standard');
+
+insert into utente  
+values(nextval('codutente'),'janvisser0999','lp0912xvza','janvisser@outlook.com','Jan','Visser','Olanda','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'bartmulder0186','9iudhsbdx','bartmuller0186@gmail.com','Bart','Muller','Olanda','Gold');
+
+insert into utente  
+values(nextval('codutente'),'erikbos1280','2jhcs73yr','erikbos1280@gmail.com','Erik','Bos','Olanda','Gold');
+
+insert into utente  
+values(nextval('codutente'),'jolandavos1078','l0azmxn232','jolandavos1078@gmail.com','Jolanda','Vos','Olanda','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'vincentsmits0993','xncj273dr','vincentsmits0993@gmail.com','Vincent','Smith','Olanda','Standard');
+
+insert into utente  
+values(nextval('codutente'),'jeanclaes0191','l2if8dsw3n','jeanclaes0191@gmail.com','Jean','Claes','Belgio','Gold');
+
+insert into utente  
+values(nextval('codutente'),'sarahaerts0399','lco903erfc','sarahaerts0399@gmail.com','Sarah','Aerts','Belgio','Standard');
+
+insert into utente  
+values(nextval('codutente'),'tomdevos0597','sj83weqo1','tomdevos0597@gmail.com','Tom','Devos','Belgio','Studenti');
+
+insert into utente  
+values(nextval('codutente'),'lindamartin0778','nchde342qs','lindamartin0779@outlook.com','Linda','Martin','Belgio','Platinum');
+
+insert into utente  
+values(nextval('codutente'),'nancyleroy0894','09ochdowmz','nancyleroy0894@outlook.com','Nancy','Leroy','Belgio','Standard');
+
+insert into utente  
+values(nextval('codutente'),'elsdenis1101','1kcjfhr832','elsdenis1101@gmail.com','Els','Denis','Belgio','Gold');
+
+
+insert into Artista
+values(nextval('codartista'),'Drake', 'Canada', 'OVO');
+
+insert into Artista
+values(nextval('codartista'),'Gue Pequeno', 'Italia', 'BHMG');
+
+insert into Artista 
+values(nextval('codartista'),'Marracash', 'Italia', 'Roccia Music');
+
+insert into Artista 
+values(nextval('codartista'),'Travis Scott', 'USA', 'Cactus Jack');
+
+insert into Artista 
+values(nextval('codartista'),'Calcutta', 'Italia', 'Bomba Dischi');
+
+insert into Artista 
+values(nextval('codartista'),'Mecna', 'Italia', 'Macro');
+
+insert into Artista 
+values(nextval('codartista'),'Coco', 'Italia', 'Roccia Music');
+
+insert into Artista 
+values(nextval('codartista'),'Don Toliver', 'USA', 'Cactus Jack');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Luis Sal', 'Italia');
+
+insert into Artista 
+values(nextval('codartista'),'Fedez', 'Italia', 'Tanta Roba');
+
+insert into Artista 
+values(nextval('codartista'),'Rkomi', 'Italia', 'Roccia Music');
+
+insert into Artista 
+values(nextval('codartista'),'Kendrick Lamar', 'USA', 'TDE');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Marco Montemagno', 'Italia');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'The Jackal', 'Italia');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Geopop', 'Italia');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Metro Boomin', 'USA');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Overtime', 'Italia');
+
+insert into Artista 
+values(nextval('codartista'),'Dua Lipa', 'Inghilterra', 'Urban Records');
+
+insert into Artista 
+values(nextval('codartista'),'PNL', 'Francia', 'QLF');
+
+insert into Artista 
+values(nextval('codartista'),'Bad Bunny', 'Porto Rico', 'Hear This Music');
+
+insert into Artista 
+values(nextval('codartista'),'JBalvin', 'Colombia', 'Sueno Globales');
+
+insert into Artista 
+values(nextval('codartista'),'Avicii', 'Svezia', 'PRMD');
+
+insert into Artista 
+values(nextval('codartista'),'Queen', 'UK', 'EMI');
+
+insert into Artista 
+values(nextval('codartista'),'Stromae', 'Belgio', 'Mercury');
+
+insert into Artista 
+values(nextval('codartista'),'Adele', 'UK', 'XL');
+
+insert into Artista 
+values(nextval('codartista'),'Post Malone', 'USA', 'Republic');
+
+insert into Artista 
+values(nextval('codartista'),'Speacock', 'Olanda', 'UNINA');
+
+insert into Artista 
+values(nextval('codartista'),'Spaveo Mattone', 'Russia', 'UNINA');
+
+insert into Artista 
+values(nextval('codartista'),'Whitney Houston', 'USA', 'Artista Records');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Jimi Hendrix', 'USA');
+
+insert into Artista 
+values(nextval('codartista'),'Bob Dylan', 'USA', 'Columbia');
+
+insert into Artista 
+values(nextval('codartista'),'Dolly Parton', 'USA', 'RCA');
+
+insert into Artista 
+values(nextval('codartista'),'Nirvana', 'USA', 'Sub Pop');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'David Bowie', 'UK');
+
+insert into Artista 
+values(nextval('codartista'),'Pino Daniele', 'Italia', 'EMI');
+
+insert into Artista 
+values(nextval('codartista'),'Sfera Ebbasta', 'Italia', 'BHMG');
+
+insert into Artista 
+values(nextval('codartista'),'Charlie Charles', 'Italia', 'BHMG');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Santa Esmeralda', 'Francia');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Nina Simone', 'USA');
+
+insert into Artista 
+values(nextval('codartista'),'The Beatles', 'UK', 'Parlophone');
+
+insert into Artista 
+values(nextval('codartista'),'Isley Brothers', 'USA', 'Epic');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Manu Chao', 'Francia');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Rodrigo Bueno', 'Argentina');
+
+insert into Artista 
+values(nextval('codartista'),'Irama', 'Italia', 'Warner Music Group');
+
+insert into Artista 
+values(nextval('codartista'),'Shablo', 'Italia', 'Roccia Music, Thaurus');
+
+insert into Artista 
+values(nextval('codartista'),'Tommaso Paradiso', 'Italia', 'Island');
+
+insert into Artista 
+values(nextval('codartista'),'Jay Rock', 'USA', 'Top Dawg');
+
+insert into Artista 
+values(nextval('codartista'),'Dr. Dre', 'USA', 'Crew Cut Records');
+
+insert into Artista 
+values(nextval('codartista'),'kehlani', 'USA', 'Atlantic Records');
+
+insert into Artista 
+values(nextval('codartista'),'SCH', 'Francia', 'Maison Baron Rouge');
+
+insert into Artista(idartista, nome, nazione)
+values(nextval('codartista'),'Lacrime', 'Francia');
+
+
+insert into produttore
+values(nextval('codprod'),'Autoproduzione');
+
+insert into produttore
+values(nextval('codprod'),'Kanye West');
+
+insert into produttore
+values(nextval('codprod'),'Shablo');
+
+insert into produttore
+values(nextval('codprod'),'Don Joe');
+
+insert into produttore
+values(nextval('codprod'),'Cash Passion');
+
+insert into produttore
+values(nextval('codprod'),'808 Melo');
+
+insert into produttore
+values(nextval('codprod'),'Alessandro Cianci');
+
+insert into produttore
+values(nextval('codprod'),'Dr. Dre');
+
+insert into produttore
+values(nextval('codprod'),'Jeff Bhasker');
+
+insert into produttore
+values(nextval('codprod'),'Tainy');
+
+insert into produttore
+values(nextval('codprod'),'DJ Snake');
+
+insert into produttore
+values(nextval('codprod'),'Nile Rodgers');
+
+insert into produttore
+values(nextval('codprod'),'Thomas Azier');
+
+insert into produttore
+values(nextval('codprod'),'Rick Rubin');
+
+insert into produttore
+values(nextval('codprod'),'VIDB1');
+
+insert into produttore
+values(nextval('codprod'),'Dre London');
+
+insert into produttore
+values(nextval('codprod'),'Bassi Maestro');
+
+insert into produttore
+values(nextval('codprod'),'Bob Ferguson');
+
+insert into produttore
+values(nextval('codprod'),'Bob Johnston');
+
+insert into produttore
+values(nextval('codprod'),'Tony Visconti');
+
+insert into produttore
+values(nextval('codprod'),'Fauves-Puma');
+
+insert into produttore
+values(nextval('codprod'),'Hal Mooney');
+
+insert into produttore
+values(nextval('codprod'),'George Martin');
+
+insert into produttore
+values(nextval('codprod'),'Charlie Charles');
+
+insert into produttore
+values(nextval('codprod'),'Willy David');
+
+insert into produttore
+values(nextval('codprod'),'Scott Litt');
+
+
+insert into album 
+values(nextval('codalbum'),'More Life', '2018', '2');
+
+insert into album 
+values(nextval('codalbum'),'Santeria', '2016', '3');
+
+insert into album 
+values(nextval('codalbum'),'Status', '2015', '4');
+
+insert into album 
+values(nextval('codalbum'),'Astroworld', '2018', '1');
+
+insert into album 
+values(nextval('codalbum'),'Heaven or Hell', '2019', '5');
+
+insert into album 
+values(nextval('codalbum'),'Jackboys', '2019', '6');
+
+insert into album 
+values(nextval('codalbum'),'Bromance', '2021', '7');
+
+insert into album 
+values(nextval('codalbum'),'Laska', '2015', '7');
+
+insert into album 
+values(nextval('codalbum'),'Taxi Driver', '2021', '3');	
+
+insert into album 
+values(nextval('codalbum'),'Good Kid, m.a.a.d city', '2012', '8');
+
+insert into album 
+values(nextval('codalbum'),'Future Nostalgia', '2020', '9');
+
+insert into album 
+values(nextval('codalbum'),'X 100PRE', '2018', '10');
+
+insert into album 
+values(nextval('codalbum'),'Colores', '2020', '11');
+
+insert into album 
+values(nextval('codalbum'),'True', '2013', '12');
+
+insert into album 
+values(nextval('codalbum'),'News of the world', '1977', '1');
+
+insert into album 
+values(nextval('codalbum'),'Racine Carrée', '2013', '13');
+
+insert into album 
+values(nextval('codalbum'),'21', '2011', '14');
+
+insert into album 
+values(nextval('codalbum'),'Le Monde Chico', '2015', '15');
+
+insert into album 
+values(nextval('codalbum'),'Stoney', '2016', '16');
+
+insert into album 
+values(nextval('codalbum'),'Vero', '2016', '17');
+
+insert into album 
+values(nextval('codalbum'),'Habemus Speacock', '2022', '1');
+
+insert into album 
+values(nextval('codalbum'),'Yo Soy Matton', '2015', '1');
+
+insert into album 
+values(nextval('codalbum'),'The Bodyguard - Soundtrack', '1992', '1');
+
+insert into album 
+values(nextval('codalbum'),'Jolene', '1974', '18');
+
+insert into album 
+values(nextval('codalbum'),'Electric Ladyland', '1968', '1');
+
+insert into album 
+values(nextval('codalbum'),'John Wesley Harding', '1967', '19');
+
+insert into album 
+values(nextval('codalbum'),'MTV Unplugged', '1994', '26');
+
+insert into album 
+values(nextval('codalbum'),'The Man Who Sold The World', '1970', '20');
+
+insert into album 
+values(nextval('codalbum'),'The Man Who Sold The World - Remaster', '2015', '20');
+
+insert into album 
+values(nextval('codalbum'),'Don''t Let Me Be Misunderstood', '2003', '21');
+
+insert into album 
+values(nextval('codalbum'),'Broadway-Blues-Ballads', '1964', '22');
+
+insert into album 
+values(nextval('codalbum'),'Please Please Me', '1963', '23');
+
+insert into album 
+values(nextval('codalbum'),'Please Please Me - Remaster', '2009', '23');
+
+insert into album 
+values(nextval('codalbum'),'The Isley Brothers', '1962', '1');
+
+insert into album 
+values(nextval('codalbum'),'XDVR', '2015', '24');
+
+insert into album 
+values(nextval('codalbum'),'Sfera Ebbasta', '2016', '24');
+
+insert into album 
+values(nextval('codalbum'),'Musicante', '1984', '25');
+
+insert into album 
+values(nextval('codalbum'),'Musicante - Remaster', '2021', '25');
+
+insert into album 
+values(nextval('codalbum'),'La Radiolina', '2007', '1');
+
+insert into album 
+values(nextval('codalbum'),'La Mano De Dios', '2000', '1');
+
+
+insert into artistaalbum 
+values('1','1');
+
+insert into artistaalbum 
+values('10','12');
+
+insert into artistaalbum 
+values('11','18');
+
+insert into artistaalbum 
+values('12','20');
+
+insert into artistaalbum 
+values('13','21');
+
+insert into artistaalbum 
+values('14','22');
+
+insert into artistaalbum 
+values('15','23');
+
+insert into artistaalbum 
+values('16','24');
+
+insert into artistaalbum 
+values('17','25');
+
+insert into artistaalbum 
+values('18','19');
+
+insert into artistaalbum 
+values('19','26');
+
+insert into artistaalbum 
+values('2','2');
+
+insert into artistaalbum 
+values('2','3');
+
+insert into artistaalbum 
+values('20','2');
+
+insert into artistaalbum 
+values('21','27');
+
+insert into artistaalbum 
+values('22','28');
+
+insert into artistaalbum 
+values('23','29');
+
+insert into artistaalbum 
+values('24','32');
+
+insert into artistaalbum 
+values('25','30');
+
+insert into artistaalbum 
+values('26','31');
+
+insert into artistaalbum 
+values('27','33');
+
+insert into artistaalbum 
+values('28','34');
+
+insert into artistaalbum 
+values('29','34');
+
+insert into artistaalbum 
+values('3','3');
+
+insert into artistaalbum 
+values('30','38');
+
+insert into artistaalbum 
+values('31','39');
+
+insert into artistaalbum 
+values('32','40');
+
+insert into artistaalbum 
+values('33','40');
+
+insert into artistaalbum 
+values('34','41');
+
+insert into artistaalbum 
+values('35','37');
+
+insert into artistaalbum 
+values('36','37');
+
+insert into artistaalbum 
+values('37','35');
+
+insert into artistaalbum 
+values('38','35');
+
+insert into artistaalbum 
+values('39','42');
+
+insert into artistaalbum 
+values('4','4');
+
+insert into artistaalbum 
+values('40','43');
+
+insert into artistaalbum 
+values('5','8');
+
+insert into artistaalbum 
+values('6','4');
+
+insert into artistaalbum 
+values('6','8');
+
+insert into artistaalbum 
+values('7','7');
+
+insert into artistaalbum 
+values('7','6');
+
+insert into artistaalbum 
+values('8','6');
+
+insert into artistaalbum 
+values('9','11');
+
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Portland', '240', '2017','Rap','Ultra HD','Gold', 25, 1);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), '4422', '250', '2017', 'Rap', 'Ultra HD', 'Gold', 7, 1);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Teenage Fever', '260', '2017', 'Rap', 'Ultra HD', 'Gold', 60, 1);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Passionfruit', '280', '2017', 'Rap', 'Ultra HD', 'Gold', 20, 1);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Salvador Dalì', '240', '2016', 'Rap', 'HD', 'Standard', 35, 2);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Nulla Accade', '230', '2016', 'Rap', 'HD', 'Standard', 40, 2);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Film Senza Volume', '260', '2016', 'Rap', 'HD', 'Standard', 70, 2);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Cashmere', '210', '2016', 'Rap', 'HD', 'Standard', 2);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Status', '200', '2015', 'Rap', 'Ultra HD', 'Platinum',10, 3);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Untitled', '210', '2015', 'Rap', 'Ultra HD', 'Platinum', 5, 3);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Catatonica', '230', '2015', 'Rap', 'Ultra HD', 'Platinum', 15, 3);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Di Nascosto', '240', '2015', 'Rap', 'Ultra HD', 'Platinum', 30, 3);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Sicko Mode', '250', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Coffee Bean', '210', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Stargazing', '250', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Yosemite', '240', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Euphoria', '230', '2019', 'Rap', 'Base', 'Standard', 50, 5);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Heaven Or Hell', '250', '2019', 'Rap', 'Base', 'Standard', 40, 5);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'No Idea', '180', '2019', 'Rap', 'Base', 'Standard', 25, 5);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Highest In The Room', '200', '2019', 'Rap', 'HD', 'Gold', 10, 6);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Out West', '180', '2019', 'Rap', 'HD', 'Gold', 20, 6);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Bromance', '190', '2021', 'R&B', 'Ultra HD', 'Studenti', 15, 7);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Chicago', '200', '2021', 'R&B', 'Ultra HD', 'Studenti', 10, 7);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'La Più Bella', '210', '2021', 'R&B', 'Ultra HD', 'Studenti', 20, 7);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), '31/08', '170', '2015', 'R&B', 'Base', 'Platinum', 15, 8);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Pace', '200', '2015', 'R&B', 'Base', 'Platinum', 25, 8);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Micidiale', '250', '2015', 'R&B', 'Base', 'Platinum', 8);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Luna Piena', '210', '2021', 'Pop', 'HD', 'Gold', 15, 9);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Mare Che Non Sei', '300', '2021', 'Pop', 'HD', 'Gold', 100, 9);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Ho Spento Il Cielo', '280', '2021', 'Pop', 'HD', 'Gold', 15, 9);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Poetic Justice', '310', '2012', 'Rap', 'Base', 'Studenti', 10, 10);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Money Trees', '290', '2012', 'Rap', 'Base', 'Studenti', 70, 10);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Compton', '215', '2012', 'Rap', 'Base', 'Studenti', 10);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Don''t Start Now', '230', '2020', 'Pop', 'Ultra HD', 'Platinum', 35, 11);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Ni Bien Ni Mal', '260', '2020', 'Raeggeton', 'HD', 'Standard', 35, 12);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Callaita', '250', '2020', 'Raeggeton', 'HD', 'Standard', 10, 12);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Mia', '260', '2020', 'Raeggeton', 'HD', 'Standard', 65, 12);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Azul', '215', '2019', 'Raeggeton', 'Base', 'Studenti', 10, 13);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Blanco', '265', '2019', 'Raeggeton', 'Base', 'Studenti', 13);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'For A Better Day', '300', '2015', 'EDM', 'HD', 'Standard', 50, 14);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'We Will Rock You', '400', '1977', 'Rock', 'HD', 'Standard', 15);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'We Are The Champions', '380', '1977', 'Rock', 'HD', 'Standard', 15);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'avf', '200', '2013', 'Rap', 'Ultra HD', 'Platinum', 35, 16);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Rolling in the Deep', '210', '2011', 'Pop', 'Ultra HD', 'Platinum', 50, 17);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Rumor Has It', '300', '2011', 'Pop', 'Ultra HD', 'Standard', 25, 17);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Le Monde Ou Rien', '200', '2015', 'Rap', 'Base', 'Platinum', 25, 18);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Sur Paname', '250', '2015', 'Rap', 'HD', 'Platinum', 35, 18);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'White Iverson', '210', '2016', 'Rap', 'Base', 'Platinum', 25, 19);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Feel', '230', '2016', 'Rap', 'Base', 'Platinum', 10, 19);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Cold', '200', '2016', 'Rap', 'Ultra HD', 'Studenti', 35, 19);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Vero', '210', '2016', 'Rap', 'Base', 'Standard', 15, 20);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Fuori Orario', '300', '2016', 'Rap', 'Ultra HD', 'Standard', 10, 20);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Things About Things', '255', '2022', 'Indie', 'HD', 'Gold', 21);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Try Me', '350', '2022', 'Indie', 'HD', 'Gold', 21);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'El Coche', '180', '2015', 'Raeggeton', 'Base', 'Studenti', 22);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'Gianni Agnelli', '360', '2015', 'Raeggeton', 'Ultra HD', 'Studenti', 22);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'XDVR', '270', '2015', 'Rap', 'Base', 'Standard', 20, 35);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Brutti Sogni', '180', '2015', 'Rap', 'Base', 'Standard', 15, 35);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Balenciaga', '200', '2016', 'Rap', 'HD', 'Platinum', 20, 36);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'BHMG', '190', '2016', 'Rap', 'HD', 'Platinum', 15, 36);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'La Vida Tombola', '210', '2007', 'Indie', 'Ultra HD', 'Platinum', 39);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+values(nextval('codtraccia'), 'La Mano De Dios', '210', '2000', 'Pop', 'HD', 'Platinum', 40);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, album)
+values(nextval('codtraccia'), 'I Will Always Love You', '250', '1994', 'Pop', 'Ultra HD', 'Cover', 'Platinum', 23);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'I Will Always Love You', '250', '1974', 'Pop', 'HD', 'Original', 'Gold', 35, 24);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'All Along The Watchtower', '280', '1968', 'Rock', 'HD' , 'Cover', 'Gold', 0, 25);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'All Along The Watchtower', '280', '1967', 'Rock', 'Base', 'Original', 'Standard', 40, 26);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'The Man Who Sold The World', '260', '1993', 'Rock', 1, 'Ultra HD', 'Cover', 'Standard', 60, 27);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'The Man Who Sold The World', '260', '1970', 'Rock', 1, 'HD', 'Original', 'Standard', 10, 28);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'The Man Who Sold The World', '260', '2015', 'Rock', 2, 'Ultra HD', 'Remaster', 'Gold', 15, 29);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Don''t Let Me Be Misunderstood', '490', '2003', 'Pop', 1, 'HD', 'Cover', 'Gold', 25, 30);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Don''t Let Me Be Misunderstood', '490', '1694', 'Blues', 1, 'Base', 'Original', 'Standard', 90, 31);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Twist and Shout', '300', '1963', 'Rock', 1, 'HD', 'Cover', 'Gold', 50, 32);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Twist and Shout', '300', '2009', 'Rock', 2, 'Ultra HD', 'Remaster', 'Platinum', 35, 33);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, album)
+values(nextval('codtraccia'), 'Twist And Shout', '300', '1962', 'Rock', 1, 'Base', 'Original', 'Standard', 34);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Keep on Movin', '220', '1984', 'Blues', 1, 'HD', 'Original', 'Gold', 35, 37);
+
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+values(nextval('codtraccia'), 'Keep on Movin', '220', '2021', 'Blues', 2, 'Ultra HD', 'Remaster', 'Platinum', 25, 38);
+
+
+insert into branipreferiti 
+values('5','1');
+
+insert into branipreferiti 
+values('5','10');
+
+insert into branipreferiti 
+values('5','11');
+
+insert into branipreferiti 
+values('5','12');
+
+insert into branipreferiti 
+values('5','13');
+
+insert into branipreferiti 
+values('5','14');
+
+insert into branipreferiti 
+values('6','5');
+
+insert into branipreferiti 
+values('6','6');
+
+insert into branipreferiti 
+values('6','7');
+
+insert into branipreferiti 
+values('6','8');
+
+insert into branipreferiti 
+values('7','13');
+
+insert into branipreferiti 
+values('7','14');
+
+insert into branipreferiti 
+values('7','15');
+
+insert into branipreferiti 
+values('8','16');
+
+insert into branipreferiti 
+values('8','17');
+
+insert into branipreferiti 
+values('8','18');
+
+insert into branipreferiti 
+values('8','19');
+
+insert into branipreferiti 
+values('9','17');
+
+insert into branipreferiti 
+values('9','18');
+
+insert into branipreferiti 
+values('9','19');
+
+insert into branipreferiti 
+values('9','36');
+
+insert into branipreferiti 
+values('10','37');
+
+insert into branipreferiti 
+values('10','35');
+
+insert into branipreferiti 
+values('11','15');
+
+insert into branipreferiti 
+values('11','16');
+
+insert into branipreferiti 
+values('11','17');
+
+insert into branipreferiti 
+values('11','18');
+
+insert into branipreferiti 
+values('12','20');
+
+insert into branipreferiti 
+values('12','21');
+
+insert into branipreferiti 
+values('12','22');
+
+insert into branipreferiti 
+values('12','23');
+
+insert into branipreferiti 
+values('13','40');
+
+insert into branipreferiti 
+values('13','41');
+
+insert into branipreferiti 
+values('13','42');
+
+insert into branipreferiti 
+values('13','45');
+
+insert into branipreferiti 
+values('13','5');
+
+insert into branipreferiti 
+values('14','16');
+
+insert into branipreferiti 
+values('14','17');
+
+insert into branipreferiti 
+values('15','51');
+
+insert into branipreferiti 
+values('15','52');
+
+insert into branipreferiti 
+values('16','24');
+
+insert into branipreferiti 
+values('16','28');
+
+insert into branipreferiti 
+values('16','29');
+
+insert into branipreferiti 
+values('17','57');
+
+insert into branipreferiti 
+values('18','58');
+
+insert into branipreferiti 
+values('19','19');
+
+insert into branipreferiti 
+values('19','20');
+
+insert into branipreferiti 
+values('19','21');
+
+insert into branipreferiti 
+values('20','8');
+
+insert into branipreferiti 
+values('20','75');
+
+insert into branipreferiti 
+values('20','74');
+
+insert into branipreferiti 
+values('20','1');
+
+insert into branipreferiti 
+values('21','18');
+
+insert into branipreferiti 
+values('21','19');
+
+insert into branipreferiti 
+values('22','22');
+
+insert into branipreferiti 
+values('22','23');
+
+insert into branipreferiti 
+values('22','24');
+
+insert into branipreferiti 
+values('25','22');
+
+insert into branipreferiti 
+values('25','23');
+
+insert into branipreferiti 
+values('25','24');
+
+insert into branipreferiti 
+values('26','6');
+
+insert into branipreferiti 
+values('26','66');
+
+insert into branipreferiti 
+values('27','72');
+
+insert into branipreferiti 
+values('27','71');
+
+insert into branipreferiti 
+values('28','25');
+
+insert into branipreferiti 
+values('28','26');
+
+insert into branipreferiti 
+values('28','27');
+
+insert into branipreferiti 
+values('28','28');
+
+insert into branipreferiti 
+values('29','67');
+
+insert into branipreferiti 
+values('29','68');
+
+insert into branipreferiti 
+values('29','7');
+
+insert into branipreferiti 
+values('30','70');
+
+insert into branipreferiti 
+values('30','7');
+
+insert into branipreferiti 
+values('30','69');
+
+insert into branipreferiti 
+values('31','71');
+
+insert into branipreferiti 
+values('31','74');
+
+insert into branipreferiti 
+values('35','8');
+
+insert into branipreferiti 
+values('35','17');
+
+insert into branipreferiti 
+values('36','68');
+
+insert into branipreferiti 
+values('36','65');
+
+insert into branipreferiti 
+values('36','64');
+
+insert into branipreferiti 
+values('37','29');
+
+insert into branipreferiti 
+values('37','30');
+
+insert into branipreferiti 
+values('37','31');
+
+insert into branipreferiti 
+values('37','32');
+
+insert into branipreferiti 
+values('38','31');
+
+insert into branipreferiti 
+values('38','32');
+
+insert into branipreferiti 
+values('39','35');
+
+insert into branipreferiti 
+values('39','36');
+
+insert into branipreferiti 
+values('39','37');
+
+insert into branipreferiti 
+values('40','58');
+
+insert into branipreferiti 
+values('40','57');
+
+insert into branipreferiti 
+values('40','56');
+
+insert into branipreferiti 
+values('41','40');
+
+insert into branipreferiti 
+values('41','41');
+
+insert into branipreferiti 
+values('45','33');
+
+insert into branipreferiti 
+values('45','34');
+
+insert into branipreferiti 
+values('45','35');
+
+insert into branipreferiti 
+values('45','36');
+
+insert into branipreferiti 
+values('46','5');
+
+insert into branipreferiti 
+values('46','51');
+
+insert into branipreferiti 
+values('47','52');
+
+insert into branipreferiti 
+values('47','51');
+
+insert into branipreferiti 
+values('47','50');
+
+insert into branipreferiti 
+values('48','52');
+
+insert into branipreferiti 
+values('48','57');
+
+insert into branipreferiti 
+values('48','58');
+
+insert into branipreferiti 
+values('49','33');
+
+insert into branipreferiti 
+values('49','35');
+
+insert into branipreferiti 
+values('49','36');
+
+insert into branipreferiti 
+values('50','37');
+
+insert into branipreferiti 
+values('50','38');
+
+insert into branipreferiti 
+values('50','39');
+
+insert into branipreferiti 
+values('51','66');
+
+insert into branipreferiti 
+values('51','67');
+
+insert into branipreferiti 
+values('51','68');
+
+insert into branipreferiti 
+values('51','7');
+
+insert into branipreferiti 
+values('52','5');
+
+insert into branipreferiti 
+values('52','42');
+
+insert into branipreferiti 
+values('52','41');
+
+
+
+
+insert into tracciaartista
+values (1,1);
+
+insert into tracciaartista
+values (2,1);
+
+insert into tracciaartista
+values (3,1);
+
+insert into tracciaartista
+values (4,1);
+
+insert into tracciaartista
+values (5,2);
+
+insert into tracciaartista
+values (5,3);
+
+insert into tracciaartista
+values (6,2);
+
+insert into tracciaartista
+values (6,3);
+
+insert into tracciaartista
+values (7,2);
+
+insert into tracciaartista
+values (7,3);
+
+insert into tracciaartista
+values (8,2);
+
+insert into tracciaartista
+values (8,3);
+
+insert into tracciaartista
+values (9,3);
+
+insert into tracciaartista
+values (10,3);
+
+insert into tracciaartista
+values (11,3);
+
+insert into tracciaartista
+values (12,3);
+
+insert into tracciaartista
+values (13,4);
+
+insert into tracciaartista
+values (14,4);
+
+insert into tracciaartista
+values (15,4);
+
+insert into tracciaartista
+values (16,4);
+
+insert into tracciaartista
+values (17,8);
+
+insert into tracciaartista
+values (18,8);
+
+insert into tracciaartista
+values (19,8);
+
+insert into tracciaartista
+values (20,4);
+
+insert into tracciaartista
+values (21,4);
+
+insert into tracciaartista
+values (22,6);
+
+insert into tracciaartista
+values (22,7);
+
+insert into tracciaartista
+values (23,6);
+
+insert into tracciaartista
+values (23,7);
+
+insert into tracciaartista
+values (24,6);
+
+insert into tracciaartista
+values (24,7);
+
+insert into tracciaartista
+values (25,6);
+
+insert into tracciaartista
+values (26,6);
+
+insert into tracciaartista
+values (27,6);
+
+insert into tracciaartista
+values (28,11);
+
+insert into tracciaartista
+values (29,11);
+
+insert into tracciaartista
+values (30,11);
+
+insert into tracciaartista
+values (31,12);
+
+insert into tracciaartista
+values (32,12);
+
+insert into tracciaartista
+values (33,12);
+
+insert into tracciaartista
+values (34,18);
+
+insert into tracciaartista
+values (35,20);
+
+insert into tracciaartista
+values (36,20);
+
+insert into tracciaartista
+values (37,20);
+
+insert into tracciaartista
+values (38,21);
+
+insert into tracciaartista
+values (39,21);
+
+insert into tracciaartista
+values (40,22);
+
+insert into tracciaartista
+values (41,23);
+
+insert into tracciaartista
+values (42,23);
+
+insert into tracciaartista
+values (43,24);
+
+insert into tracciaartista
+values (44,25);
+
+insert into tracciaartista
+values (45,25);
+
+insert into tracciaartista
+values (46,19);
+
+insert into tracciaartista
+values (47,19);
+
+insert into tracciaartista
+values (48,26);
+
+insert into tracciaartista
+values (49,26);
+
+insert into tracciaartista
+values (50,26);
+
+insert into tracciaartista
+values (51,2);
+
+insert into tracciaartista
+values (52,2);
+
+insert into tracciaartista
+values (53,27);
+
+insert into tracciaartista
+values (54,27);
+
+insert into tracciaartista
+values (55,28);
+
+insert into tracciaartista
+values (56,28);
+
+insert into tracciaartista
+values (57,36);
+
+insert into tracciaartista
+values (58,36);
+
+insert into tracciaartista
+values (59,36);
+
+insert into tracciaartista
+values (60,36);
+
+insert into tracciaartista
+values (61,42);
+
+insert into tracciaartista
+values (62,43);
+
+insert into tracciaartista
+values (63,29);
+
+insert into tracciaartista
+values (64,32);
+
+insert into tracciaartista
+values (65,31);
+
+insert into tracciaartista
+values (66,30);
+
+insert into tracciaartista
+values (67,33);
+
+insert into tracciaartista
+values (68,34);
+
+insert into tracciaartista
+values (69,34);
+
+insert into tracciaartista
+values (70,39);
+
+insert into tracciaartista
+values (71,38);
+
+insert into tracciaartista
+values (72,41);
+
+insert into tracciaartista
+values (73,40);
+
+insert into tracciaartista
+values (74,40);
+
+insert into tracciaartista
+values (75,35);
+
+insert into tracciaartista
+values (76,35);
+
+
+insert into featuring
+values (12,2);
+
+insert into featuring
+values (13,1);
+
+insert into featuring
+values (17,4);
+
+insert into featuring
+values (28,44);
+
+insert into featuring
+values (28,45);
+
+insert into featuring
+values (30,46);
+
+insert into featuring
+values (31,1);
+
+insert into featuring
+values (32,47);
+
+insert into featuring
+values (33,48);
+
+insert into featuring
+values (37,1);
+
+insert into featuring
+values (49,49);
+
+insert into featuring
+values (59,50);
+
+
+insert into traccederivate
+values (65,66);
+
+insert into traccederivate
+values (67,68);
+
+insert into traccederivate
+values (70,71);
+
+insert into traccederivate
+values (72,74);
+
+insert into traccederivate
+values (69,68);
+
+insert into traccederivate
+values (73,74);
+
+insert into traccederivate
+values (76,75);
+
+
+
+
+insert into riproduzione values
+(nextval('codrip'), '1', '1', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '1', '65', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '1', '65', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '1', '65', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '2', '17', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '2', '17', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '2', '17', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '2', '17', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '2', '17', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '3', '46', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '3', '46', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '3', '46', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '3', '46', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '12', '65', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '12', '54', '00-06');
+
+insert into riproduzione values
+(nextval('codrip'), '12', '54', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '12', '45', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '6', '45', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '6', '37', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '6', '37', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '7', '13', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '7', '14', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '7', '13', '00-06');
+
+insert into riproduzione values
+(nextval('codrip'), '11', '13', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '11', '44', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '11', '69', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '33', '18', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '33', '16', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '33', '16', '18-24');
+
+insert into riproduzione values
+(nextval('codrip'), '33', '18', '00-06');
+
+insert into riproduzione values
+(nextval('codrip'), '33', '18', '00-06');
+
+insert into riproduzione values
+(nextval('codrip'), '17', '35', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '17', '41', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '19', '41', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '19', '41', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '19', '50', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '23', '50', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '23', '51', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '23', '56', '12-18');
+
+insert into riproduzione values
+(nextval('codrip'), '32', '60', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '32', '61', '06-12');
+
+insert into riproduzione values
+(nextval('codrip'), '32', '62', '06-12');
+
+
+
+
+--VISTE
+
+--Questa vista ci consente di visualizzare il numero di ascolti effettuati da 
+--un utente in una determinata fascia oraria e in un determinato giorno.
+CREATE VIEW ascolti_fascia AS (
+ SELECT DISTINCT ti.idtraccia,
+	ti.titolo,
+	ti.versione,
+    u.nomeutente,
+    r.fasciaoraria,
+	COUNT(*) AS numeroascolti
+  FROM utente u, traccia ti, riproduzione r
+  WHERE u.idutente = r.utente AND ti.idtraccia = r.traccia
+  GROUP BY ti.idtraccia, u.nomeutente, r.fasciaoraria, ti.versione
+  ORDER BY ti.titolo
+);
+
+
+--Questa vista ci consente di visualizzare il numero totale di ascolti per ogni traccia.
+CREATE VIEW ascolti_traccia AS( 
+ SELECT DISTINCT ti.idtraccia,
+	ti.titolo,
+	ti.versione,
+	COUNT(*) AS ascoltitotali
+ FROM traccia ti, riproduzione rp
+ WHERE ti.idtraccia = rp.traccia
+ GROUP BY ti.idtraccia, ti.versione
+ ORDER BY ascoltitotali DESC
+);
+
+
+--Questa vista ci consente di visualizzare i compensi di ogni produttore per una determinata traccia.
+CREATE VIEW compensi_traccia AS(
+ SELECT p.nome,
+		ti.idtraccia,
+		ti.titolo,
+		(at.ascoltitotali * 1 * ti.percentualeprod) / 100.00 AS valore
+ FROM ascolti_traccia at, traccia ti, produttore p, album a
+ WHERE ti.idtraccia = at.idtraccia AND p.idprod = a.produttore AND ti.album = a.idalbum AND p.nome!='Autoproduzione'
+ GROUP BY p.nome, ti.idtraccia, valore
+ ORDER BY valore DESC
+);
+
+
+--Questa vista ci consente di visualizzare i guadagni totali di ogni singolo produttore.
+CREATE VIEW compensi_totali AS(
+ SELECT p.nome,
+		SUM(c.valore) AS totale_compensi
+ FROM compensi_traccia c, produttore p
+ WHERE p.nome = c.nome
+ GROUP BY c.nome, p.nome
+ ORDER BY (SUM(c.valore)) ASC
+);
+
+
+--Questa vista ci consente di visualizzare il numero di ascolti che ha fatto un utente per una determinata traccia.
+CREATE VIEW ascolti_utente AS(
+ SELECT u.nomeutente,
+	    af.idtraccia,
+	    af.titolo,
+	    af.versione,
+	    SUM(af.numeroascolti) AS ascolti
+ FROM ascolti_fascia af, utente u
+ WHERE u.nomeutente = af.nomeutente
+ GROUP BY af.idtraccia, af.titolo, u.nomeutente, af.versione);
+
+
+--Questa vista ci consente di visualizzare il numero massimo di ascolti 
+--per un utente in una determinata fascia oraria.
+CREATE VIEW max_fascia AS(
+ SELECT u.nomeutente,
+		af.fasciaoraria,
+		SUM(af.numeroascolti) AS numero_ascolti
+ FROM ascolti_fascia af, utente u
+ WHERE u.nomeutente = af.nomeutente
+ GROUP BY af.fasciaoraria, u.nomeutente
+ ORDER BY (SUM(af.numeroascolti)) DESC);
+
+
+--TRIGGER
+
+--Questo trigger ci permette di controllare se un utente ha un piano sufficiente per accedere ad un brano.
+CREATE FUNCTION controllo() RETURNS trigger AS $$
+DECLARE
+piano_utente utente.piano%TYPE;
+piano_traccia traccia.accesso%TYPE;
+BEGIN
+--Prendiamo il piano dell'utente in questione.
+SELECT ut.piano
+INTO piano_utente
+FROM utente ut
+WHERE new.utente=ut.idutente;
+
+--Prendiamo il piano della traccia.
+SELECT tr.accesso
+INTO piano_traccia
+FROM traccia tr
+WHERE new.traccia=tr.idtraccia;
+
+--Facciamo i vari controlli per verificare se abbiamo un piano sufficiente per interagire con la traccia.
+IF ((piano_utente='Standard' AND piano_traccia!='Standard') OR ((piano_utente='Studenti' AND piano_traccia!='Standard') AND (piano_utente='Studenti' AND piano_traccia!='Studenti')) OR ((piano_utente='Gold' AND piano_traccia!='Standard') AND (piano_utente='Gold' AND piano_traccia!='Studenti') AND (piano_utente='Gold' AND piano_traccia!='Gold'))) THEN
+	RAISE EXCEPTION 'Brano non disponibile, passa ad un abbonamento superiore.';
+END IF;
+RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER check_riproduzione
+AFTER INSERT ON riproduzione
+FOR EACH ROW
+EXECUTE PROCEDURE controllo();
+
+CREATE TRIGGER check_brani_preferiti
+AFTER INSERT ON branipreferiti
+FOR EACH ROW
+EXECUTE PROCEDURE controllo();
+
+
+
+--Questo trigger ci consente di azzerare i compensi per una traccia se appartiene ad un album autoprodotto.
+CREATE FUNCTION azzera_compensi() RETURNS trigger AS $$
+DECLARE
+codice_album album.idalbum%TYPE;
+prod album.produttore%TYPE;
+BEGIN
+--Prendiamo il codice dell'album in questione.
+SELECT tr.album
+INTO codice_album
+FROM traccia AS tr
+WHERE new.idtraccia=tr.idtraccia;
+--Prendiamo il codice del produttore dell'album.
+SELECT al.produttore
+INTO prod
+FROM album AS al
+WHERE codice_album=al.idalbum;
+--Se produttore uguale ad 1 settare percentuale a 0.
+IF prod='1' THEN
+	UPDATE traccia
+	SET percentualeprod=0
+	WHERE new.idtraccia=idtraccia;
+END IF;
+RETURN NEW;
+END
+$$LANGUAGE PLPGSQL;
+
+CREATE TRIGGER controllo_azzera_compensi
+AFTER INSERT ON traccia
+FOR EACH ROW
+EXECUTE PROCEDURE azzera_compensi();
+
+
+
+
+--Questo Trigger ci consente di riassegnare la produzione di un album da N ad 1 se il produttore viene cancellato dalla piattaforma.
+CREATE FUNCTION riassegna_produttore() RETURNS trigger AS $$
+BEGIN
+--Modifico l'attributo produttore di album da N ad 1.
+UPDATE album
+SET produttore='1'
+WHERE produttore IS NULL;
+
+RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER controllo_eliminazione_produttore
+AFTER DELETE ON produttore
+FOR EACH ROW
+EXECUTE PROCEDURE riassegna_produttore();
+
+
+
+--Questo trigger si attiva dopo una modifica nella tabella album.
+CREATE FUNCTION set_autoproduzione() RETURNS trigger AS $$
+DECLARE
+--Questo cursore seleziona tutti gli album con produttore uguale ad 1.
+cursore CURSOR FOR SELECT * FROM album WHERE produttore='1';
+
+BEGIN
+--Modifico i compensi della traccia da N a 0.
+FOR record IN cursore LOOP
+	UPDATE traccia
+	SET percentualeprod=0
+	WHERE record.idalbum=album;
+END LOOP;
+RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER controllo_set_autoproduzione
+AFTER UPDATE ON album
+FOR EACH ROW
+EXECUTE PROCEDURE set_autoproduzione();
+
+
+
+
+--Se un Admin trasforma un utente Client ad Admin, il suo piano diventa Platinum.
+CREATE FUNCTION cambio_piano_admin() RETURNS trigger AS $$
+BEGIN
+IF new.accesso='Admin' THEN
+ UPDATE utente
+ SET piano='Platinum'
+ WHERE new.idutente=idutente;
+END IF;
+
+RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER cambio_piano_admin_check
+AFTER UPDATE OF accesso ON utente
+FOR EACH ROW
+EXECUTE PROCEDURE cambio_piano_admin();
+
+
+
+
+--Questo trigger ci consente controllare se un artista inserisce due album aventi lo stesso nome.
+CREATE FUNCTION check_album() RETURNS trigger AS $$
+DECLARE
+--Questo cursore seleziona i titoli degli album di questo artista.
+cursore CURSOR FOR SELECT al.titolo FROM album as al, artistaalbum as aral WHERE new.idartista=aral.idartista AND aral.idalbum=al.idalbum AND new.idalbum!=al.idalbum;
+title album.titolo%TYPE;
+BEGIN
+--Prendiamo il titolo del nuovo album che si vuole inserire.
+SELECT al.titolo
+INTO title
+FROM album as al
+WHERE new.idalbum=al.idalbum;
+--Verifichiamo se quest'artista ha già pubblicato quest'album.
+FOR record IN cursore LOOP
+	IF title=record.titolo THEN
+			RAISE EXCEPTION 'Album già inserito per quest"artista.';
+
+	END IF;
+END LOOP;
+RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER controllo_unicità_album
+AFTER INSERT ON artistaalbum
+FOR EACH ROW
+EXECUTE PROCEDURE check_album();
+
+
+
+
+--Questo trigger si attiva dopo la cancellazione di un artista, andando ad eliminare automaticamente anche tutti i suoi album.
+CREATE FUNCTION check_artista() RETURNS trigger AS $$
+DECLARE
+--Questo cursore seleziona tutti gli id degli album dell'artista in questione.
+cursore CURSOR FOR SELECT al.idalbum FROM album AS al WHERE al.idalbum NOT IN(SELECT arl.idalbum
+									FROM artistaalbum as arl);
+contatore integer:=0;
+BEGIN
+--Con questa istruzione procediamo con l'eliminazione.
+FOR record IN cursore LOOP
+	DELETE FROM album AS al WHERE al.idalbum=record.idalbum;
+END LOOP;
+RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+
+CREATE TRIGGER controllo_cancella_artista
+AFTER DELETE ON artista
+FOR EACH ROW
+EXECUTE PROCEDURE check_artista();
+
+
+
+--PROCEDURE E FUNZIONI DI CONTROLLO.
+
+
+/*Questa procedura di controllo ci servirà in più casi per verificare se un artista inserito come parametro esiste oppure no.*/
+CREATE OR REPLACE PROCEDURE controllo_esistenza_artista(codice_artista artista.idartista%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+BEGIN
+	--Controlliamo se ci sono artisti con questo codice.
+	SELECT  count(*)
+	INTO	contatore
+	FROM	artista as art
+	WHERE	art.idartista=codice_artista;
+
+	IF contatore=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA105';
+	END IF;
+EXCEPTION
+WHEN SQLSTATE 'NA105' THEN
+	RAISE NOTICE 'Artista inesistente.';
+	ROLLBACK;
+end
+$$ language plpgsql;
+
+
+
+
+/*Questa procedura di controllo ci servirà a verificare se un utente è un Admin*/
+CREATE OR REPLACE PROCEDURE controllo_admin(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+tipo utente.accesso%TYPE;
+BEGIN
+--Verifichiamo che nome utente e password siano corretti.
+SELECT count(*)
+INTO contatore
+FROM utente as ut
+WHERE ut.nomeutente=nickname_admin AND ut.password=pass;
+
+IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA116';
+END IF;
+
+--Verifichiamo che l'accesso sia di tipo Admin.
+SELECT ut.accesso
+INTO tipo
+FROM utente as ut
+WHERE ut.nomeutente=nickname_admin AND ut.password=pass;
+
+IF tipo='Client' THEN
+	RAISE EXCEPTION USING ERRCODE='NA117';
+END IF;
+
+EXCEPTION
+WHEN SQLSTATE 'NA116' THEN
+	RAISE NOTICE 'Nome utente o password errati.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA117' THEN
+	RAISE NOTICE 'Non sei autorizzato ad eseguire questa operazione.';
+	ROLLBACK;
+END
+$$ language plpgsql;
+
+
+
+
+--Questa funzione serve a trovare la versione più adatta per una determinata traccia.
+CREATE OR REPLACE FUNCTION trova_versione(tipo_traccia traccia.tipo%TYPE, codice_originale traccia.idtraccia%TYPE, codice_artista artista.idartista%TYPE) RETURNS traccia.versione%TYPE AS $$
+DECLARE
+cursore CURSOR FOR SELECT tr.tipo, tr.versione FROM traccia AS tr, traccederivate AS td, tracciaartista as ta WHERE codice_originale=td.originale AND td.derivata=tr.idtraccia AND ta.artista=codice_artista AND ta.traccia=tr.idtraccia;
+temporanea1 traccia.tipo%TYPE;
+temporanea2 traccia.tipo%TYPE;
+vers traccia.versione%TYPE:=1;
+contatore integer:=0;
+BEGIN
+--Inizializziamo temporanea1 con il tipo della traccia in minuscolo.
+temporanea1:=LOWER(tipo_traccia);
+--Verifichiamo se la traccia è una versione successiva di un altra eventuale traccia.
+FOR record IN cursore LOOP
+	temporanea2:=lower(record.tipo);
+	IF  temporanea1=temporanea2 THEN
+		contatore:=contatore+1;
+		IF vers<record.versione THEN
+			vers=record.versione;
+		END IF;
+	END IF;
+END LOOP;
+
+IF contatore!=0 THEN
+ vers=vers+1;
+END IF;
+
+RETURN vers;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+
+--Questa procedura permette di verificare se nome utente e password sono inseriti nel modo corretto.
+CREATE OR REPLACE PROCEDURE controllo_utente(committente utente.nomeutente%TYPE, pass utente.password%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+BEGIN
+--Controlliamo se nome utente e password sono corretti.
+SELECT count(*) 
+INTO contatore
+FROM utente AS u
+WHERE u.nomeutente = committente AND u.password = pass;
+	
+IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA116';
+END IF;
+EXCEPTION
+WHEN SQLSTATE 'NA116' THEN
+	RAISE NOTICE 'Nome Utente o Password Errati';
+	ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+--Questa procedura permette di controllare l'esistenza di un album.
+CREATE OR REPLACE PROCEDURE controllo_esistenza_album(codice_album album.idalbum%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+BEGIN
+--Verifichiamo che l'album esista.
+	SELECT count(*)
+	INTO contatore
+	FROM album as a
+	WHERE a.idalbum=codice_album;
+
+	IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA119';
+	END IF;
+EXCEPTION
+WHEN SQLSTATE 'NA119' THEN
+	RAISE NOTICE 'Album Inesistente.';
+	ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+
+--Questa procedura permette di controllare l'esistenza di una traccia.
+CREATE OR REPLACE PROCEDURE controllo_esistenza_traccia(codice_traccia traccia.idtraccia%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+BEGIN
+--Controllo se la traccia esiste sulla piattaforma.
+SELECT COUNT(*)
+INTO contatore
+FROM traccia as tr
+WHERE codice_traccia=tr.idtraccia;
+
+IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA110';
+END IF;
+EXCEPTION
+WHEN SQLSTATE 'NA110' THEN
+	RAISE NOTICE 'Traccia inesistente.';
+	ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+--Questa procedura di controllo ci resistuisce una lista lista di tracce derivate e originali per un determinato brano e associati ad un determinato artista.
+CREATE OR REPLACE FUNCTION visualizza_derivate(codice_traccia traccia.idtraccia%TYPE, codice_artista artista.idartista%TYPE)
+RETURNS table(
+	idtraccia traccia.idtraccia%TYPE)
+	LANGUAGE plpgsql AS $$
+DECLARE
+contatore integer:=0;
+codice_originale traccia.idtraccia%TYPE;
+begin
+--Controllo l'esistenza della traccia.
+	SELECT COUNT(*)
+	INTO contatore
+	FROM tracciaartista AS tr
+	WHERE tr.traccia=codice_traccia AND tr.artista=codice_artista;
+	
+	IF contatore=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA110';
+	END IF;
+	
+	--Mi ricavo il codice della traccia originale.
+	SELECT td.originale
+	INTO codice_originale
+	FROM traccederivate as td
+	WHERE td.derivata=codice_traccia;
+	
+	IF codice_originale IS NULL THEN
+		codice_originale:=codice_traccia;
+	END IF;
+	RETURN QUERY(SELECT tr.idtraccia
+					FROM traccia AS tr, traccederivate AS td, tracciaartista AS ta
+					WHERE codice_originale=td.originale AND td.derivata=ta.traccia AND ta.artista=codice_artista AND td.derivata=tr.idtraccia
+				UNION
+				SELECT tra.idtraccia
+				FROM traccia AS tra
+				WHERE tra.idtraccia=codice_originale);
+	
+EXCEPTION
+WHEN SQLSTATE 'NA110' THEN
+	RAISE NOTICE 'Traccia inesistente.';
+	ROLLBACK;
+end
+$$;
+
+
+
+--FUNZIONI
+
+
+/*Questa funzione ci ritornerà una tabella contenete la lista dei guadagni totali di
+ogni produttore. Questa funzione sarà accessibile solo da un Admin.*/
+CREATE OR REPLACE FUNCTION lista_compensi (nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE)
+RETURNS table(
+	NomeProduttore compensi_totali.nome%type,
+	Totale_Compensi compensi_totali.totale_compensi%type
+	) LANGUAGE PLPGSQL
+	AS $$
+BEGIN 
+	--Richiamo la funzione per controllare se la chiamata è avvenuta da un admin.
+	call controllo_admin(nickname_admin, pass);
+	
+	RETURN QUERY (SELECT ct.nome, ct.totale_compensi
+		      FROM compensi_totali AS ct);
+END 
+$$;
+
+
+
+/*Questa funzione ci ritornerà la durata totale di un determinato album.*/
+CREATE OR REPLACE FUNCTION durata_album(codice_album album.idalbum%TYPE) RETURNS varchar as $$
+DECLARE
+	--Dichiariamo un cursore che ci scorre tutte le tracce appartenenti all'album in questione.
+	cursore CURSOR FOR SELECT tr.durata 
+		       FROM traccia as tr
+		       WHERE tr.album=codice_album;
+	nome_album album.titolo%TYPE;
+	durata_totale integer:=0;
+	output_album varchar(200);
+BEGIN
+	--Sommiamo con un FOR tutte le durate delle varie tracce.
+	FOR record IN cursore LOOP
+		durata_totale:=durata_totale+record.durata;
+	END LOOP;
+
+	IF durata_totale=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA101';
+	END IF;
+	
+	--Andiamo a prendere il titolo dell'album in questione dalla tabella album.
+	SELECT titolo
+	INTO nome_album
+	FROM album as al
+	WHERE al.idalbum=codice_album;
+
+	--Andiamo a formare il nostro output dinamicamente.
+	output_album:=nome_album||' '||'durata: '||durata_totale||' secondi.';
+	
+	RETURN output_album;
+EXCEPTION
+	WHEN SQLSTATE 'NA101' THEN
+	RAISE NOTICE 'Album inesistente o vuoto.';
+	ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+/*Questa funzione ci restituisce una tabella contenente la lista delle tracce ascoltabili
+in base al suo piano.*/
+CREATE OR REPLACE FUNCTION tracce_ascoltabili(committente utente.nomeutente%TYPE) 
+RETURNS table(
+	idtraccia traccia.idtraccia%TYPE,
+	titolo traccia.titolo%TYPE,
+	anno traccia.anno%TYPE,
+	genere traccia.genere%TYPE,
+	qualitàaudio traccia.qualitàaudio%TYPE) LANGUAGE PLPGSQL
+	AS $$
+DECLARE
+	apici varchar:=chr(39);
+	tipo utente.piano%TYPE;
+	sql_dinamico varchar(2000):='SELECT tr.idtraccia, tr.titolo, tr.anno, tr.genere, tr.qualitàaudio FROM traccia as tr WHERE (tr.accesso='||apici||'Standard'||apici||' ';
+BEGIN
+	--Prendiamo il piano che è associato ad un utente.
+	SELECT ut.piano
+	INTO tipo
+	FROM utente as ut
+	WHERE ut.nomeutente=committente;
+
+	IF tipo IS NULL THEN
+		RAISE EXCEPTION USING ERRCODE='NA102';
+	END IF;
+
+	--Andiamo a modellare la nostra Query di ritorno dinamicamente.
+	IF tipo='Studenti' THEN
+		sql_dinamico:=sql_dinamico||'OR tr.accesso='||apici||'Studenti'||apici||' ';
+	ELSIF tipo='Gold' THEN
+		sql_dinamico:=sql_dinamico||'OR tr.accesso='||apici||'Studenti'||apici||' OR tr.accesso='||apici||'Gold'||apici||' ';
+	ELSIF tipo='Platinum' THEN
+		sql_dinamico:=sql_dinamico||'OR tr.accesso='||apici||'Studenti'||apici||' OR tr.accesso='||apici||'Gold'||apici||' OR tr.accesso='||apici||'Platinum'||apici||' ';
+	END IF;
+
+	sql_dinamico:=sql_dinamico||');';
+
+	RETURN QUERY EXECUTE sql_dinamico;
+EXCEPTION
+	WHEN SQLSTATE 'NA102' THEN
+	RAISE NOTICE 'Nome utente errato.';
+	ROLLBACK;
+END
+$$;
+
+
+
+/*Questa funzione restituisce una tabella contenete tutti gli album di un artista cercato.*/
+CREATE OR REPLACE FUNCTION ricerca_album(codice_artista artista.idartista%TYPE) 
+RETURNS table(
+	titolo album.titolo%TYPE,
+	anno album.anno%TYPE
+	) LANGUAGE PLPGSQL
+	AS $$
+DECLARE
+	--Il cursore ci prende tutti gli album di un determinato artista.
+	cursore CURSOR FOR SELECT arl.idalbum
+		       FROM artistaalbum as arl
+		       WHERE codice_artista=arl.idartista;
+	apici varchar:=chr(39);
+	contatore integer:=0;
+	sql_dinamico varchar(300):='SELECT al.titolo, al.anno FROM album as al WHERE(';
+BEGIN
+	--Controlliamo se ci sono artisti con questo codice.
+	call controllo_esistenza_artista(codice_artista);
+
+	--Andiamo a modellare la nostra Query di ritorno dinamicamente.
+	--È presente un contatore per controllare se esistono album di questo determinato artista.
+	FOR record IN cursore LOOP
+		contatore:=contatore+1;
+		sql_dinamico:=sql_dinamico||'al.idalbum='||apici||record.idalbum||apici||' OR ';
+	END LOOP;
+
+	IF contatore=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA106';
+	END IF;
+
+	sql_dinamico:=sql_dinamico||'1=0);';
+	
+	RETURN QUERY EXECUTE sql_dinamico;
+
+EXCEPTION
+	WHEN SQLSTATE 'NA106' THEN
+	RAISE NOTICE 'Non sono presenti album di questo artista.';
+	ROLLBACK;
+END
+$$;
+
+
+
+/*Questa funzione ritorna la lista delle tracce per un determinato artista.*/
+CREATE OR REPLACE FUNCTION ricerca_tracce(codice_artista artista.idartista%TYPE) 
+RETURNS table(
+	titolo traccia.titolo%TYPE,
+	durata traccia.durata%TYPE,
+	anno traccia.anno%TYPE,
+	accesso traccia.accesso%TYPE
+	) LANGUAGE PLPGSQL
+	AS $$
+DECLARE
+	--Il cursore ci prende tutte le tracce per un determinato artista.
+	cursore CURSOR FOR SELECT traccia
+		       FROM tracciaartista as ta
+		       WHERE codice_artista=ta.artista;
+	apici varchar:=chr(39);
+	contatore integer:=0;
+	sql_dinamico varchar(300):='SELECT tr.titolo, tr.durata, tr.anno, tr.accesso FROM traccia as tr WHERE(';
+BEGIN
+	--Controlliamo se ci sono artisti con questo codice.
+	call controllo_esistenza_artista(codice_artista);
+
+	--Andiamo a modellare la nostra Query di ritorno dinamicamente.
+	--È presente un contatore per controllare se esistono tracce di questo determinato artista.
+	FOR record IN cursore LOOP
+		contatore:=contatore+1;
+		sql_dinamico:=sql_dinamico||'tr.idtraccia='||apici||record.traccia||apici||' OR ';
+	END LOOP;
+	
+	IF contatore=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA107';
+	END IF;
+
+	sql_dinamico:=sql_dinamico||'1=0);';
+	
+	RETURN QUERY EXECUTE sql_dinamico;
+
+EXCEPTION
+	WHEN SQLSTATE 'NA107' THEN
+	RAISE NOTICE 'Non sono presenti tracce di quest"artista.';
+	ROLLBACK;
+END
+$$;
+
+
+
+/*Questa funzione ritorna i brani in cui ha partecipato come artista ospite.*/
+CREATE OR REPLACE FUNCTION ricerca_featuring(codice_artista artista.idartista%TYPE) 
+RETURNS table(
+	titolo traccia.titolo%TYPE,
+	durata traccia.durata%TYPE,
+	anno traccia.anno%TYPE,
+	accesso traccia.accesso%TYPE
+	) LANGUAGE PLPGSQL
+	AS $$
+DECLARE
+	--Il cursore ci scorre tutte le tracce in cui l'artista ha partecipato come ospite.
+	cursore CURSOR FOR SELECT traccia
+		       FROM featuring
+		       WHERE codice_artista=artistaospite;
+	apici varchar:=chr(39);
+	contatore integer:=0;
+	sql_dinamico varchar(300):='SELECT tr.titolo, tr.durata, tr.anno, tr.accesso FROM traccia as tr WHERE(';
+BEGIN
+	--Controlliamo se ci sono artisti con questo codice.
+	call controllo_esistenza_artista(codice_artista);
+
+	--Andiamo a modellare la nostra Query di ritorno dinamicamente.
+	--È presente un contatore per controllare se esistono tracce in cui ha partecipato l'artista.
+	FOR record IN cursore LOOP
+		contatore:=contatore+1;
+		sql_dinamico:=sql_dinamico||'tr.idtraccia='||apici||record.traccia||apici||' OR ';
+	END LOOP;
+	
+	IF contatore=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA118';
+	END IF;
+
+	sql_dinamico:=sql_dinamico||'1=0);';
+	
+	RETURN QUERY EXECUTE sql_dinamico;
+
+EXCEPTION
+	WHEN SQLSTATE 'NA118' THEN
+	RAISE NOTICE 'Non sono presenti featuring.';
+	ROLLBACK;
+END
+$$;
+
+
+
+/*Questa funzione ritorna la lista delle tracce ascoltate in un determinato paese.*/
+CREATE OR REPLACE FUNCTION tendenze_nazioni(location utente.nazione%TYPE)
+RETURNS table(
+	titolo traccia.titolo%TYPE,
+	anno traccia.anno%TYPE,
+	genere traccia.genere%TYPE) LANGUAGE PLPGSQL
+	AS $$
+DECLARE
+	--Con SQL dinamico modelliamo questa query.
+	sql_dinamico varchar(1000):='SELECT  distinct(tr.titolo), tr.anno, tr.genere 
+	FROM traccia as tr, riproduzione as rip, utente as ut 
+	WHERE ut.idutente=rip.utente and rip.traccia=tr.idtraccia and ut.nazione=';
+
+	apici varchar:=chr(39);
+
+	contatore1 integer:=0;
+	contatore2 integer:=0;
+
+BEGIN
+	--Scriviamo l'ultima parte della Query in cui manca solo il paese.
+	sql_dinamico:=sql_dinamico||apici||location||apici||';';
+
+	--Controlliamo se il paese è presente sulla piattaforma.
+	SELECT count(*)
+	INTO contatore1
+	FROM utente as ut
+	WHERE ut.nazione=location;
+
+	IF contatore1=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA108';
+	END IF;
+
+	--Controlliamo se ci sono ascolti in quel paese.
+	SELECT count(*)
+	INTO contatore2
+	FROM utente as ut, riproduzione as rp
+	WHERE ut.nazione=location and ut.idutente=rp.utente;
+
+	IF contatore2=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA109';
+	END IF;
+
+	RETURN QUERY EXECUTE sql_dinamico;
+
+EXCEPTION
+	WHEN SQLSTATE 'NA108' THEN
+	RAISE NOTICE 'La nazione non è presente sulla piattaforma.';
+	ROLLBACK;
+
+	WHEN SQLSTATE 'NA109' THEN
+	RAISE NOTICE 'Non ci sono riproduzioni in questa nazione.';
+	ROLLBACK;
+END
+$$;
+
+
+
+/*Questa funzione restituisce una lista di utenti che hanno effettuato più ascolti di una determinata traccia rispetto alla media.*/
+CREATE OR REPLACE FUNCTION visualizza_ascolti(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE, codice_artista artista.idartista%TYPE)
+RETURNS table(
+	NomeUtente ascolti_utente.nomeutente%TYPE,
+	idtraccia ascolti_utente.idtraccia%TYPE,
+	Titolo ascolti_utente.titolo%TYPE,
+	Versione ascolti_utente.versione%TYPE, 
+	AscoltiEffettuati ascolti_utente.ascolti%TYPE)
+	LANGUAGE plpgsql AS $$
+DECLARE
+contatore integer:=0;
+BEGIN 
+	--Controllo se l'utente è Admin.
+	call controllo_admin(nickname_admin,pass);
+
+	--Controllo se la traccia esiste.
+	call controllo_esistenza_traccia(codice_traccia);
+	
+	--Controllo se la traccia è stata mai ascoltata.
+	SELECT COUNT(*)
+	INTO contatore
+	FROM ascolti_utente AS au
+	WHERE au.idtraccia=codice_traccia;
+	
+	IF contatore=0 THEN
+			RAISE EXCEPTION USING ERRCODE='NA115';
+	END IF;
+
+
+	RETURN QUERY(SELECT *
+				 FROM ascolti_utente AS au
+				 WHERE au.ascolti>=(SELECT AVG(a.ascolti) AS media
+								   FROM ascolti_utente AS a
+								   WHERE a.idtraccia IN (SELECT *
+														FROM visualizza_derivate(codice_traccia,codice_artista)))
+				 AND au.idtraccia IN (SELECT *
+									 FROM visualizza_derivate(codice_traccia,codice_artista)));
+				
+	
+EXCEPTION
+WHEN SQLSTATE 'NA115' THEN
+	RAISE NOTICE 'Traccia mai ascoltata.';
+	ROLLBACK;
+END
+$$; 
+
+
+
+/*Questa funzione ci restituisce la fascia oraria in cui un determinato utente effettua più ascolti*/
+CREATE OR REPLACE FUNCTION visualizza_fascia(nickname_admin utente.NomeUtente%TYPE, pass utente.Password%TYPE, utente_cercato utente.NomeUtente%TYPE)
+RETURNS table(
+fasciaOraria max_fascia.fasciaoraria%TYPE,
+numero_ascolti max_fascia.numero_ascolti%type) 
+LANGUAGE PLPGSQL AS $$ 
+DECLARE
+	contatore integer:=0;
+BEGIN
+	--Controllo se l'utente è Admin
+	call controllo_admin(nickname_admin, pass);
+
+	--Controllo se l'utente cercato esiste.
+	SELECT count(*) 
+	INTO contatore
+	FROM utente AS u
+	WHERE u.nomeutente = utente_cercato;
+
+	IF contatore=0 THEN
+		RAISE EXCEPTION USING ERRCODE='NA111';
+	END IF;
+	
+	--Ritorno una query contentente la fascia oraria in cui un utente ha effettuato più ascolti.
+	RETURN QUERY (SELECT  p2.fasciaoraria, p2.numero_ascolti
+		     FROM max_fascia as p2
+		     WHERE p2.nomeutente= utente_cercato and p2.numero_ascolti>=ALL(SELECT max(p1.numero_ascolti)
+					     			   FROM max_fascia as p1
+			       		    			   WHERE p1.nomeutente=p2.nomeutente)
+		     GROUP BY p2.fasciaoraria, p2.numero_ascolti);
+
+EXCEPTION
+WHEN SQLSTATE 'NA111' THEN
+	RAISE NOTICE 'Utente da cercare inesistente';
+	ROLLBACK;
+END
+$$;
+
+
+
+/*Questa funzione resistuisce la lista delle tracce di un determinato album.*/
+CREATE OR REPLACE FUNCTION visualizza_tracce_album(codice_album album.idalbum%TYPE)
+RETURNS table(
+titolo traccia.titolo%TYPE,
+durata traccia.durata%TYPE
+) LANGUAGE PLPGSQL AS $$
+BEGIN
+	--Verifichiamo che l'album esista.
+	call controllo_esistenza_album(codice_album);
+
+	--Ritorniamo le tracce appartenenti ad un determinato album.
+	RETURN QUERY(SELECT ti.titolo, ti.durata
+				 FROM traccia as ti, album as a
+				 WHERE a.idalbum = ti.album
+				 AND a.idalbum=codice_album);
+END
+$$;
+
+
+
+/*Questa funzione restiuisce la lista dei brani preferiti per un determinato utente*/
+CREATE OR REPLACE FUNCTION visualizza_brani_preferiti(committente utente.nomeutente%TYPE, pass utente.password%TYPE)
+RETURNS TABLE 
+(titolo traccia.titolo%TYPE,
+ album album.titolo%TYPE) 
+LANGUAGE PLPGSQL AS $$
+DECLARE 
+	utente_var utente%ROWTYPE;
+	contatore integer:=0;
+BEGIN
+	--Verifichiamo che il nome utente sia corretto e ci prenderemo in una variabile
+	--rowtype l'id dell'utente che ci servirà in seguito.
+	SELECT * 
+	INTO utente_var
+	FROM utente as ut
+	WHERE ut.nomeutente=committente AND ut.password=pass;
+
+	IF utente_var IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA116';
+	END IF;
+
+	--Verifichiamo se l'utente ha qualche traccia inserita nella lista dei brani preferiti.
+	SELECT count(*) 
+	INTO contatore
+	FROM branipreferiti as br
+	WHERE br.utente=utente_var.idutente;
+	
+	IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA116';
+	END IF;	
+
+	RETURN QUERY(
+		SELECT t.titolo, a.titolo
+		FROM branipreferiti as b, traccia as t, album as a
+		WHERE b.utente = utente_var.idutente
+		AND t.idtraccia = b.traccia
+		AND t.album = a.idalbum);
+EXCEPTION
+WHEN SQLSTATE 'NA102' THEN
+	RAISE NOTICE 'Nome utente errato.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA112' THEN
+	RAISE NOTICE 'Lista Brani Preferiti Vuota.';
+	ROLLBACK;
+END 
+$$;
+
+
+
+
+/*Questa procedura ci consente di cambiare lo status di un utente da Admin a Client oppure da Client ad Admin.
+Questa operazione potrà essere eseguita solo da un Admin*/
+CREATE OR REPLACE PROCEDURE cambio_utente(utente utente.nomeutente%TYPE, pass utente.password%TYPE, client utente.nomeutente%TYPE, trasformazione utente.accesso%TYPE) AS $$
+DECLARE
+	tip_richiedente utente%ROWTYPE;
+	tip_ricevente utente%ROWTYPE;
+BEGIN
+	--Verifichiamo se il richiedente esiste.
+	--La variabile rowtype ci servirà in seguito per verificare lo status del richiedente.
+	SELECT *
+	INTO tip_richiedente
+	FROM utente as u
+	WHERE u.nomeutente=utente and u.password=pass;
+
+	IF tip_richiedente IS NULL THEN
+		RAISE EXCEPTION USING ERRCODE='NA116';
+	END IF;
+
+	--Verifichiamo se il ricevente esiste.
+	--La variabile rowtype ci servirà in seguito per verificare lo status del ricevente.
+	SELECT *
+	INTO tip_ricevente
+	FROM utente AS u
+	WHERE u.nomeutente=client;
+
+	IF tip_ricevente is NULL THEN
+		RAISE EXCEPTION USING ERRCODE='NA111';
+	END IF;
+
+	--Facciamo tutte le possibile verifiche per capire quale operazione bisogna eseguire.
+	IF tip_richiedente.accesso='Admin' AND tip_ricevente.accesso='Client' AND trasformazione='Admin' THEN
+		UPDATE utente
+		SET accesso='Admin'
+		WHERE client=utente.nomeutente;
+	ELSIF tip_richiedente.accesso='Admin' AND tip_ricevente.accesso='Admin' AND trasformazione='Client' THEN
+		UPDATE utente
+		SET accesso='Client'
+		WHERE client=utente.nomeutente;
+	ELSIF tip_richiedente.accesso='Client' THEN
+		RAISE EXCEPTION USING ERRCODE='NA117';
+	ELSIF tip_ricevente.accesso='Admin' and trasformazione='Admin' THEN
+		RAISE EXCEPTION USING ERRCODE='NA120';
+	ELSIF tip_ricevente.accesso='Client' and trasformazione='Client' THEN
+		RAISE EXCEPTION USING ERRCODE='NA121';
+	END IF;
+
+EXCEPTION
+WHEN SQLSTATE 'NA117' THEN
+	RAISE NOTICE 'Utente non autorizzato.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA116' THEN
+	RAISE NOTICE 'Nome Utente o Password errati.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA111' THEN
+	RAISE NOTICE 'Utente non trovato.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA120' THEN
+	RAISE NOTICE 'Utente cercato è già Admin.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA121' THEN
+	RAISE NOTICE 'Utente cercato è già Client.';
+	ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+--Questa procedura permette ad un utente di registrarsi.
+CREATE OR REPLACE PROCEDURE registrazione_utente(nickname utente.nomeutente%TYPE, pass utente.password%TYPE, posta_elettronica utente.mail%TYPE,nome_ins utente.nome%TYPE, cognome_ins utente.cognome%TYPE, paese utente.nazione%TYPE, abbonamento utente.piano%TYPE) as $$
+DECLARE
+apice varchar:=chr(39);
+sql_dinamico varchar(1000);
+BEGIN
+--Modelliamo la nostra istruzione di insert.
+sql_dinamico:='insert into utente values(nextval('||apice||'codutente'||apice||'),
+'||apice||nickname||apice||','||apice||pass||apice||','||apice||posta_elettronica||apice||',
+'||apice||nome_ins||apice||','||apice||cognome_ins||apice||',
+'||apice||paese||apice||','||apice||abbonamento||apice||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE '23505' THEN
+		RAISE NOTICE 'Nome utente o mail già utilizzato.';
+		ROLLBACK;
+WHEN SQLSTATE '23514' THEN
+		RAISE NOTICE 'Dati inseriti non validi, controlla i seguenti parametri: 
+		-Password, minimo 6 caratteri.
+		-E-mail, formato non corretto.';
+		ROLLBACK;
+END
+$$ language plpgsql;
+
+
+
+/*Questa procedura consente ad un Admin di aggiungere un nuovo artista alla piattaforma*/
+CREATE OR REPLACE PROCEDURE inserimento_artista(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, nome artista.nome%TYPE, paese artista.nazione%TYPE, etichetta_ins artista.etichetta%TYPE default NULL) as $$
+DECLARE
+sql_dinamico varchar(1000);
+apici varchar:=chr(39);
+BEGIN
+--Controlliamo se il richiedente dell'operazione sia un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Modelliamo la nostra istruzione di insert.
+sql_dinamico:='insert into Artista values(nextval('||apici||'codartista'||apici||'),'||apici||nome||apici||','||apici||paese||apici||'';
+
+--Verifichiamo se abbiamo inserito l'etichetta nei parametri.
+IF etichetta_ins IS NOT NULL THEN
+	sql_dinamico:=sql_dinamico||','||apici||etichetta_ins||apici||'';
+END IF;
+
+sql_dinamico:=sql_dinamico||');';
+
+EXECUTE sql_dinamico;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+/*Questa procedura consente ad un Admin di inserire un nuovo produttore.*/
+CREATE OR REPLACE PROCEDURE inserimento_produttore(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, nome_prod produttore.nome%TYPE)
+as $$
+DECLARE
+sql_dinamico varchar(1000);
+apici varchar:=chr(39);
+BEGIN
+--Verifichiamo che il richiedente sia un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Modelliamo la nostra istruzione di insert.
+sql_dinamico:='insert into produttore values(nextval('||apici||'codprod'||apici||'),'||apici||nome_prod||apici||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE '23505' THEN
+		RAISE NOTICE 'Produttore già esistente.';
+		ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+--Questa procedura consente ad un Admin di inserire un nuovo album appartenente ad un artista.
+CREATE OR REPLACE PROCEDURE inserimento_album(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE,codice_artista artista.idartista%TYPE, nome_album album.titolo%TYPE, 
+nome_prod produttore.nome%TYPE, data_pubblicazione album.anno%TYPE default DATE_PART('year', current_date)) as $$
+DECLARE
+codiceprod produttore.idprod%TYPE;
+apici varchar:=chr(39);
+sql_dinamico varchar(1000);
+BEGIN
+
+--Controllo se il richiedente è un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Andiamo a verificare se il produttore inserito esiste prendendoci il suo codice identificativo.
+SELECT pr.idprod
+INTO codiceprod
+FROM produttore AS pr
+WHERE pr.nome=nome_prod;
+
+IF codiceprod IS NULL then
+	RAISE EXCEPTION USING ERRCODE='NA123';
+END IF;
+
+call controllo_esistenza_artista(codice_artista);
+
+--Modelliamo la nostra istruzione di insert per la tabella album.
+sql_dinamico:='insert into album values(nextval('||apici||'codalbum'||apici||'),'||apici||nome_album||apici||','||apici||data_pubblicazione||apici||','||apici||codiceprod||apici||');';
+
+--Modelliamo una seconda istruzione di insert per la tabella artistaalbum.
+sql_dinamico:=sql_dinamico||'   '||'insert into artistaalbum values(currval('||apici||'codalbum'||apici||'),'||apici||codice_artista||apici||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+
+WHEN SQLSTATE 'NA123' THEN
+	RAISE NOTICE 'Codice produttore errato.';
+	ROLLBACK;
+WHEN SQLSTATE '23514' THEN
+	RAISE NOTICE 'Data inserita non valida.';
+	ROLLBACK;
+WHEN SQLSTATE '23505' THEN
+		RAISE NOTICE 'Artista già associato all"album in questione.';
+		ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+/*Nel caso in cui un album sia stato fatto da più artisti, è possibile aggiungere manualmente i restanti artisti nella tabella artistaalbum*/
+CREATE OR REPLACE PROCEDURE inserimento_artistaalbum(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_album album.idalbum%TYPE, codice_artista artista.idartista%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+sql_dinamico varchar(1000);
+BEGIN
+--Controllo se il richiedente è un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Controllo se l'artista inserito esiste.
+call controllo_esistenza_artista(codice_artista);
+
+--Verifico se l'album inserito esiste.
+call controllo_esistenza_album(codice_album);
+
+--Modello la mia istruzione di inserimento dinamicamente.
+sql_dinamico:='insert into artistaalbum values('||codice_album||','||codice_artista||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE '23505' THEN
+	RAISE NOTICE 'L"artista è già associato a quest"album.';
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+/*Questa procedura consente ad un Admin di inserire una nuova traccia in un album*/
+CREATE OR REPLACE PROCEDURE inserimento_traccia(nickname_admin utente.nomeutente%TYPE, 
+pass utente.password%TYPE,codice_artista artista.idartista%TYPE, nome_album album.titolo%TYPE, 
+nome_traccia traccia.titolo%TYPE, durata_traccia traccia.durata%TYPE, 
+genere_traccia traccia.genere%TYPE, qualità traccia.qualitàaudio%TYPE,tipo_traccia traccia.tipo%TYPE, accesso_traccia traccia.accesso%TYPE, 
+percentualeproduttore traccia.percentualeprod%TYPE, codice_traccia_originale traccia.idtraccia%TYPE DEFAULT NULL) AS $$
+DECLARE
+anno_pubblicazione album.anno%TYPE;
+versione_traccia traccia.versione%TYPE;
+cod_album album.idalbum%TYPE;
+sql_dinamico varchar(20000);
+apici varchar:=chr(39);
+BEGIN
+
+--Verifichiamo che il richiedente sia un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Verifichiamo l'esistenza dell'artista.
+call controllo_esistenza_artista(codice_artista);
+
+--Andiamo a recuperare il codice dell'album e l'anno di pubblicazione dell'album in questione.
+SELECT al.idalbum, al.anno
+INTO cod_album, anno_pubblicazione
+FROM album AS al, artistaalbum AS ar
+WHERE al.titolo=nome_album AND ar.idartista=codice_artista AND al.idalbum=ar.idalbum;
+
+IF cod_album IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA119';
+END IF;
+
+--Ci ricaviamo con la funzione trova versione, la versione più adatta alla nostra traccia.
+versione_traccia:=trova_versione(tipo_traccia,codice_traccia_originale,codice_artista);
+
+--Andiamo a modellare la nostra istruzione di inserimento.
+sql_dinamico:='insert into traccia values(nextval('||apici||'codtraccia'||apici||'),'||apici||nome_traccia||apici||','||apici||durata_traccia||apici||','||apici||
+anno_pubblicazione||apici||','||apici||genere_traccia||apici||','||versione_traccia||','||apici||
+qualità||apici||','||apici||tipo_traccia||apici||','||apici||accesso_traccia||apici||','||apici||
+percentualeproduttore||apici||','||cod_album||');';
+
+--Modelliamo una seconda istruzione di inserimento che riguarderà la tabella tracciaartista.
+sql_dinamico:=sql_dinamico||'   '||'insert into tracciaartista values(currval('||apici||'codtraccia'||apici||'),'||apici||codice_artista||apici||');';
+
+--Se la traccia è diversa da quella originale ha bisogno del codice della traccia originale.
+IF LOWER(tipo_traccia)!='original' AND codice_traccia_originale IS	 NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA126';
+END IF;
+
+IF LOWER(tipo_traccia)!='original' THEN
+--Andiamo a modellare l'istruzione di inserimento per la tabella traccederivate.
+sql_dinamico:=sql_dinamico||'   '||'insert into traccederivate values(currval('||apici||'codtraccia'||apici||'),'||apici||codice_traccia_originale||apici||');';
+END IF;
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+
+WHEN SQLSTATE 'NA119' THEN
+	RAISE NOTICE 'Album inesistente.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA126' THEN
+	RAISE NOTICE 'Inserire il codice della traccia originale.';
+	ROLLBACK;
+WHEN SQLSTATE '23514' THEN
+	RAISE NOTICE 'Uno dei seguenti campo è errato:
+			-Durata traccia.
+			-Percentuale Produttore.';
+	ROLLBACK;
+WHEN SQLSTATE '23505' THEN
+		RAISE NOTICE 'Artista già associato alla traccia oppure la traccia derivata è già 
+		associata ad una traccia originale.';
+		ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+/*Nel caso in cui una traccia sia stata fatta da più artisti, è possibile aggiungere manualmente i restanti artisti nella tabella tracciaartista*/
+CREATE OR REPLACE PROCEDURE inserimento_tracciaartista(codice_traccia traccia.idtraccia%TYPE, codice_artista artista.idartista%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+sql_dinamico varchar(1000);
+BEGIN
+--Controllo se l'artista inserito sia presente sulla piattaforma.
+call controllo_esistenza_artista(codice_artista);
+
+--Controllo se la traccia esiste sulla piattaforma.
+call controllo_esistenza_traccia(codice_traccia);
+
+sql_dinamico:='insert into tracciaartista values('||codice_traccia||','||codice_artista||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE '23505' THEN
+	RAISE NOTICE 'L"artista è già associato a questa traccia.';
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+CREATE OR REPLACE PROCEDURE inserimento_featuring(codice_traccia traccia.idtraccia%TYPE, codice_artista artista.idartista%TYPE) AS $$
+DECLARE
+contatore integer:=0;
+sql_dinamico varchar(1000);
+BEGIN
+--Controllo se l'artista inserito sia presente sulla piattaforma.
+call controllo_esistenza_artista(codice_artista);
+
+--Controllo se la traccia esiste sulla piattaforma.
+call controllo_esistenza_traccia(codice_traccia);
+
+sql_dinamico:='insert into featuring values('||codice_traccia||','||codice_artista||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE '23505' THEN
+	RAISE NOTICE 'L"artista è già associato a questa traccia.';
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+/*Questa procedura ci consente di inserire una riproduzione per un determinato utente.*/
+CREATE OR REPLACE PROCEDURE inserimento_riproduzione(committente utente.nomeutente%TYPE, codice_traccia traccia.idtraccia%TYPE) AS $$
+DECLARE
+dett_utente utente%ROWTYPE;
+sql_dinamico varchar(1000);
+temporanea timestamp;
+tempo double precision;
+fascia riproduzione.fasciaoraria%TYPE;
+apici varchar:=chr(39);
+BEGIN
+--Inseriamo in temporanea la data e l'ora corrente.
+temporanea:=CURRENT_TIMESTAMP;
+--Estraiamo nella variabile tempo l'ora.
+tempo:=EXTRACT('hour' FROM temporanea);
+
+--Verifichiamo la correttezza del nome utente.
+SELECT *
+INTO dett_utente
+FROM utente AS ut
+WHERE ut.nomeutente=committente;
+
+IF dett_utente IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA102';
+END IF;
+
+--Tramite varie IF inseriamo in fascia l'intervallo temporale in cui è avvenuta la riproduzione.
+IF(tempo BETWEEN 06 AND 12) THEN
+fascia:='06-12';
+ELSIF (tempo BETWEEN 12 AND 18) THEN
+fascia:='12-18';
+ELSIF (tempo BETWEEN 18 AND 24) THEN
+fascia:='18-24';
+ELSIF (tempo BETWEEN 00 AND 06) THEN
+fascia:='00-06';
+END IF;
+
+--Modelliamo dinamicamente la nostra istruzione di inserimento.
+sql_dinamico:='insert into riproduzione values(nextval('||apici||'codrip'||apici||'),'
+||apici||dett_utente.idutente||apici||','||apici||codice_traccia||apici||','||apici||fascia||apici||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA102' THEN
+	RAISE NOTICE 'Nome utente errato.';
+	ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+
+/*Questa procedura ci consente di inserire tracce nella lista dei brani preferiti*/
+CREATE OR REPLACE PROCEDURE inserimento_brani_preferiti(committente utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE) AS $$
+DECLARE
+controllo_utente utente%ROWTYPE;
+sql_dinamico varchar(1000);
+apici varchar:=chr(39);
+BEGIN
+
+--Controlliamo se nome utente e password sono corretti.
+SELECT *
+INTO controllo_utente
+FROM utente AS ut
+WHERE committente=ut.nomeutente AND pass=ut.password;
+
+IF controllo_utente IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA116';
+END IF;
+
+--Modelliamo la nostra istruzione di inserimento.
+sql_dinamico:='insert into branipreferiti values('||apici||controllo_utente.idutente||apici||','||apici||codice_traccia||apici||');';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA116' THEN
+	RAISE NOTICE 'Nome utente o password errati.';
+	ROLLBACK;
+WHEN SQLSTATE '23505' THEN
+		RAISE NOTICE 'Traccia già presente nella lista dei brani preferiti.';
+		ROLLBACK;
+END
+$$ LANGUAGE PLPGSQL;
+
+
+
+
+--Questa procedura consente ad un utente di modificare la sua email.
+CREATE OR REPLACE PROCEDURE modifica_mail(committente utente.nomeutente%TYPE, pass utente.password%TYPE, nuovo_indirizzo utente.mail%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+email utente.mail%TYPE;
+BEGIN 
+
+--Controlliamo se nome utente e password sono corretti.
+call controllo_utente(committente,pass);
+
+select u.mail
+into email
+from utente as u
+where committente=u.nomeutente and u.password=pass;
+
+--Verifichiamo se la nuova mail da inserire non sia quella già esistente.
+IF email = nuovo_indirizzo THEN
+	RAISE EXCEPTION USING ERRCODE='NA130';
+END IF;
+
+--Modelliamo la nostra istruzione di modifica.
+sql_dinamico = 'update utente set mail = '|| apice || nuovo_indirizzo || apice || 
+				'where nomeutente = ' || apice || committente || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA130' THEN
+	RAISE NOTICE 'L"indirizzo mail inserito è già in uso';
+	ROLLBACK; 
+WHEN SQLSTATE '23514' THEN
+	RAISE NOTICE 'Formato Mail Errato';
+	ROLLBACK;
+WHEN SQLSTATE '23505' THEN
+	RAISE NOTICE 'Mail utilizzata per un account esistente';
+	ROLLBACK;
+END 
+$$;
+
+
+
+/*Questa procedura ci consente all'utente di modificare la password*/
+CREATE OR REPLACE PROCEDURE modifica_password(committente utente.nomeutente%TYPE, pass utente.password%TYPE, nuova_pass utente.password%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+BEGIN 
+
+--Controlliamo se nomeutente e password sono corretti.
+call controllo_utente(committente,pass);
+
+--Verifichiamo che la nuova password sia diversa dalla vecchia.
+IF pass = nuova_pass THEN
+	RAISE EXCEPTION USING ERRCODE='NA131';
+END IF;
+	
+--Modelliamo la nostra istruzione di modifica.
+sql_dinamico = 'update utente set password = '|| apice || nuova_pass || apice || 
+				'where nomeutente = ' || apice || committente || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA131' THEN
+	RAISE NOTICE 'Utilizza una password diversa dalla precedente';
+	ROLLBACK; 
+WHEN SQLSTATE '23514' THEN
+	RAISE NOTICE 'Password troppo breve';
+	ROLLBACK;
+END 
+$$;
+
+
+
+--Questa procedura ci consente di modificare la qualità audio di una determinata traccia.
+CREATE OR REPLACE PROCEDURE modifica_qualità_traccia(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE, nuova_qualità traccia.qualitàaudio%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+brano traccia%ROWTYPE;
+BEGIN 
+--Controlliamo che il richiedente dell'operazione sia un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Controlliamo se la traccia in questione esiste.
+SELECT * 
+INTO brano
+FROM traccia AS ti
+WHERE ti.idtraccia = codice_traccia;
+	
+IF brano IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA110';
+END IF;
+
+--Facciamo un ulteriore controllo per vedere se la qualità attuale è uguale alla qualità che si vorrebbe apportare
+IF LOWER(brano.qualitàaudio)=LOWER(nuova_qualità) THEN
+	RAISE EXCEPTION USING ERRCODE='NA132';
+END IF;
+	
+--Modelliamo la nostra istruzione di modifica.
+sql_dinamico = 'update traccia set qualitàaudio = '|| apice || nuova_qualità || apice || 
+				'where idtraccia = ' || apice || codice_traccia || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA110' THEN
+	RAISE NOTICE 'Traccia inesistente';
+	ROLLBACK;
+WHEN SQLSTATE 'NA132' THEN
+	RAISE NOTICE 'Qualità audio non modificata.';
+	ROLLBACK;
+END 
+$$;
+
+
+
+--Questa procedura ci consente di modificare il tipo d'accesso di una determinata traccia.
+CREATE OR REPLACE PROCEDURE modifica_accesso_traccia(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE, nuovo_accesso traccia.accesso%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+brano traccia%ROWTYPE;
+BEGIN 
+
+--Controlliamo che il richiedente dell'operazione sia un Admin.
+call controllo_admin(nickname_admin, pass);
+	
+--Verifichiamo se la traccia esiste.
+SELECT * 
+INTO brano
+FROM traccia AS ti
+WHERE ti.idtraccia = codice_traccia;
+	
+IF brano IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA110';
+END IF;
+
+--Verifichiamo se l'accesso che vogliamo cambiare sia uguale al tipo richiesto dall'Admin.
+IF brano.accesso = nuovo_accesso THEN
+	RAISE EXCEPTION USING ERRCODE='NA133';
+END IF;
+	
+--Modelliamo la nostra istruzione di modifica.
+sql_dinamico = 'update traccia set accesso = '|| apice || nuovo_accesso || apice || 
+		  'where idtraccia = ' || apice || codice_traccia || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA110' THEN
+	RAISE NOTICE 'Traccia inesistente';
+	ROLLBACK;
+WHEN SQLSTATE 'NA133' THEN
+	RAISE NOTICE 'Accesso traccia non modificato.';
+	ROLLBACK;
+END 
+$$;
+
+
+
+
+
+--Questa procedura ci consente di modificare l'etichetta di un artista.
+CREATE OR REPLACE PROCEDURE modifica_etichetta_artista(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_artista artista.idartista%TYPE, nuova_etichetta artista.etichetta%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+eti artista.etichetta%TYPE;
+BEGIN 
+--Verifichiamo se il richiedente dell'operazione è un Admin.
+call controllo_admin(nickname_admin, pass);
+--Verifichiamo se l'artista inserito esiste.	
+call controllo_esistenza_artista(codice_artista);
+	
+--Prendiamo il nome dell'etichetta da sostituire.
+SELECT etichetta
+INTO eti
+FROM artista
+WHERE idartista=codice_artista;
+	
+IF eti = nuova_etichetta THEN
+	RAISE EXCEPTION USING ERRCODE='NA133';
+END IF;
+
+--Modelliamo la nostra istruzione di modifica.
+sql_dinamico = 'update artista set etichetta = '|| apice || nuova_etichetta || apice || 
+				'where idartista = ' || apice || codice_artista || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA133' THEN
+	RAISE NOTICE 'Nessunna Modifica Apportata';
+	ROLLBACK;
+END 
+$$;
+
+
+
+--Questa procedura consente ad un Admin di eliminare un Album.
+CREATE OR REPLACE PROCEDURE cancella_album(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_album album.idalbum%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+BEGIN
+--Controlliamo che il richiedente dell'operazione sia un Admin.
+call controllo_admin(nickname_admin, pass);
+
+--Verifichiamo l'esistenza dell'album.
+call controllo_esistenza_album(codice_album);
+	
+--Modelliamo la nostra istruzione di cancellazione.
+sql_dinamico = 'delete from album where idalbum = ' || apice || codice_album || apice || ';';
+
+EXECUTE sql_dinamico;
+END 
+$$;
+
+
+
+--Questa procedura consente ad un Admin di eliminare una traccia.
+CREATE OR REPLACE PROCEDURE cancella_traccia(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE)    
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+BEGIN
+--Verifichiamo che il richiedente dell'operazione sia un Admin.
+call controllo_admin(nickname_admin, pass);
+	
+--Verifichiamo se la traccia selezionata esista.
+call controllo_esistenza_traccia(codice_traccia);
+
+--Modelliamo la nostra istruzione di cancellazione.
+sql_dinamico = 'delete from traccia where idtraccia = ' || apice || codice_traccia || apice || ';';
+
+EXECUTE sql_dinamico;
+END 
+$$;
+
+
+
+--Questa procedura può essere usata da un Admin per cancellare un artista.
+CREATE OR REPLACE PROCEDURE cancella_artista(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_artista artista.idartista%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+BEGIN
+--Verifichiamo se il richiedente dell'operazione è un Admin.
+call controllo_admin(nickname_admin,pass);
+--Verifichiamo l'esistenza dell'artista.
+call controllo_esistenza_artista(codice_artista);
+--Modelliamo la nostra istruzione di cancellazione.
+sql_dinamico = 'delete from artista where idartista = ' || apice || codice_artista || apice || ';';
+
+EXECUTE sql_dinamico;
+END
+$$;
+
+
+
+--Questa procedura permette ad un utente di cancellare una traccia dalla sua lista dei brani preferiti.
+CREATE OR REPLACE PROCEDURE cancella_traccia_preferita(committente utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+codice_utente utente.idutente%TYPE;
+contatore integer:=0;
+apice varchar = CHR(39);
+BEGIN
+--Controlliamo se nomeutente e password sono corretti.
+SELECT idutente 
+INTO codice_utente
+FROM utente AS u
+WHERE u.nomeutente = committente AND u.password = pass;
+	
+IF codice_utente is null THEN
+	RAISE EXCEPTION USING ERRCODE='NA116';
+END IF;
+	
+--Verifichiamo se la traccia è presente nella lista dei brani preferiti.
+SELECT COUNT(*) 
+INTO contatore
+FROM  branipreferiti AS bp
+WHERE bp.traccia = codice_traccia AND bp.utente = codice_utente;
+	
+IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA110';
+END IF;
+
+--Modelliamo la nostra istruzione di cancellazione.
+sql_dinamico = 'delete from branipreferiti where traccia = ' || apice || codice_traccia || apice || ' 
+				and utente = ' || apice || codice_utente || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA116' THEN
+	RAISE NOTICE 'Nome Utente o Password Errati';
+	ROLLBACK;
+WHEN SQLSTATE 'NA110' THEN
+	RAISE NOTICE 'Traccia non trovata';
+	ROLLBACK;
+END 
+$$;
+
+
+
+
+--Questa procedura permette ad un Admin di eliminare un Client.
+CREATE OR REPLACE PROCEDURE cancella_utente(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, utente_da_eliminare utente.nomeutente%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+accesso_utente utente%ROWTYPE;
+BEGIN
+--Controlliamo se il richiedente dell'operazione è un Admin.
+call controllo_admin(nickname_admin,pass);
+--Verifichiamo che il nomeutente dell'utente da eliminare sia corretto.
+SELECT *
+INTO accesso_utente
+FROM utente AS u
+WHERE u.nomeutente = utente_da_eliminare;
+
+IF accesso_utente IS NULL THEN
+	RAISE EXCEPTION USING ERRCODE='NA102';
+END IF;
+
+--Verifichiamo che l'utente da eliminare sia un Client.
+IF accesso_utente.accesso='Admin' THEN
+	RAISE EXCEPTION USING ERRCODE='NA134';
+END IF;
+
+--Modelliamo la nostra istruzione di cancellazione.
+sql_dinamico = 'delete from utente where nomeutente = ' || apice || utente_da_eliminare || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA102' THEN
+	RAISE NOTICE 'Nome Utente errato.';
+	ROLLBACK;
+WHEN SQLSTATE 'NA134' THEN
+	RAISE NOTICE 'L"utente non può essere eliminato.';
+	ROLLBACK;
+END
+$$;
+
+
+
+--Questa procedura consente ad un Admin di eliminare un produttore.
+CREATE OR REPLACE PROCEDURE cancella_produttore(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, nome_prod produttore.nome%TYPE)
+LANGUAGE plpgsql AS $$
+DECLARE 
+sql_dinamico varchar(1000);
+apice varchar = CHR(39);
+contatore integer:=0;
+BEGIN
+--Verifichiamo che il richiedente dell'operazione sia un Admin.
+call controllo_admin(nickname_admin,pass);
+
+--Verifichiamo se il produttore esiste.
+SELECT COUNT(*)
+INTO contatore
+FROM produttore AS pr
+WHERE pr.nome = nome_prod;
+
+IF contatore=0 THEN
+	RAISE EXCEPTION USING ERRCODE='NA134';
+END IF;
+
+--Modelliamo la nostra istruzione di cancellazione.
+sql_dinamico = 'delete from produttore where nome = ' || apice || nome_prod || apice || ';';
+
+EXECUTE sql_dinamico;
+
+EXCEPTION
+WHEN SQLSTATE 'NA134' THEN
+	RAISE NOTICE 'Produttore non trovato';
+	ROLLBACK;
+END
+$$;
