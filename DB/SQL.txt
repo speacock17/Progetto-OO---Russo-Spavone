@@ -90,7 +90,7 @@ Create table Traccia
   Anno integer NOT NULL,
   Genere varchar(15),
   Versione integer NOT NULL DEFAULT '1',
-  QualitàAudio varchar(20) NOT NULL DEFAULT 'Base',
+  QualitaAudio varchar(20) NOT NULL DEFAULT 'Base',
   Tipo varchar(20) NOT NULL DEFAULT 'Original',
   Accesso Piano NOT NULL DEFAULT 'Standard',
   PercentualeProd integer NOT NULL DEFAULT '0',
@@ -856,232 +856,232 @@ insert into artistaalbum
 values('9','11');
 
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Portland', '240', '2017','Rap','Ultra HD','Gold', 25, 1);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), '4422', '250', '2017', 'Rap', 'Ultra HD', 'Gold', 7, 1);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Teenage Fever', '260', '2017', 'Rap', 'Ultra HD', 'Gold', 60, 1);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Passionfruit', '280', '2017', 'Rap', 'Ultra HD', 'Gold', 20, 1);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Salvador Dalì', '240', '2016', 'Rap', 'HD', 'Standard', 35, 2);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Nulla Accade', '230', '2016', 'Rap', 'HD', 'Standard', 40, 2);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Film Senza Volume', '260', '2016', 'Rap', 'HD', 'Standard', 70, 2);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Cashmere', '210', '2016', 'Rap', 'HD', 'Standard', 2);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Status', '200', '2015', 'Rap', 'Ultra HD', 'Platinum',10, 3);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Untitled', '210', '2015', 'Rap', 'Ultra HD', 'Platinum', 5, 3);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Catatonica', '230', '2015', 'Rap', 'Ultra HD', 'Platinum', 15, 3);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Di Nascosto', '240', '2015', 'Rap', 'Ultra HD', 'Platinum', 30, 3);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Sicko Mode', '250', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Coffee Bean', '210', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Stargazing', '250', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Yosemite', '240', '2018', 'Rap', 'Ultra HD', 'Studenti', 4);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Euphoria', '230', '2019', 'Rap', 'Base', 'Standard', 50, 5);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Heaven Or Hell', '250', '2019', 'Rap', 'Base', 'Standard', 40, 5);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'No Idea', '180', '2019', 'Rap', 'Base', 'Standard', 25, 5);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Highest In The Room', '200', '2019', 'Rap', 'HD', 'Gold', 10, 6);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Out West', '180', '2019', 'Rap', 'HD', 'Gold', 20, 6);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Bromance', '190', '2021', 'R&B', 'Ultra HD', 'Studenti', 15, 7);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Chicago', '200', '2021', 'R&B', 'Ultra HD', 'Studenti', 10, 7);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'La Più Bella', '210', '2021', 'R&B', 'Ultra HD', 'Studenti', 20, 7);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), '31/08', '170', '2015', 'R&B', 'Base', 'Platinum', 15, 8);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Pace', '200', '2015', 'R&B', 'Base', 'Platinum', 25, 8);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Micidiale', '250', '2015', 'R&B', 'Base', 'Platinum', 8);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Luna Piena', '210', '2021', 'Pop', 'HD', 'Gold', 15, 9);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Mare Che Non Sei', '300', '2021', 'Pop', 'HD', 'Gold', 100, 9);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Ho Spento Il Cielo', '280', '2021', 'Pop', 'HD', 'Gold', 15, 9);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Poetic Justice', '310', '2012', 'Rap', 'Base', 'Studenti', 10, 10);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Money Trees', '290', '2012', 'Rap', 'Base', 'Studenti', 70, 10);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Compton', '215', '2012', 'Rap', 'Base', 'Studenti', 10);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Don''t Start Now', '230', '2020', 'Pop', 'Ultra HD', 'Platinum', 35, 11);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Ni Bien Ni Mal', '260', '2020', 'Raeggeton', 'HD', 'Standard', 35, 12);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Callaita', '250', '2020', 'Raeggeton', 'HD', 'Standard', 10, 12);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Mia', '260', '2020', 'Raeggeton', 'HD', 'Standard', 65, 12);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Azul', '215', '2019', 'Raeggeton', 'Base', 'Studenti', 10, 13);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Blanco', '265', '2019', 'Raeggeton', 'Base', 'Studenti', 13);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'For A Better Day', '300', '2015', 'EDM', 'HD', 'Standard', 50, 14);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'We Will Rock You', '400', '1977', 'Rock', 'HD', 'Standard', 15);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'We Are The Champions', '380', '1977', 'Rock', 'HD', 'Standard', 15);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'avf', '200', '2013', 'Rap', 'Ultra HD', 'Platinum', 35, 16);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Rolling in the Deep', '210', '2011', 'Pop', 'Ultra HD', 'Platinum', 50, 17);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Rumor Has It', '300', '2011', 'Pop', 'Ultra HD', 'Standard', 25, 17);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Le Monde Ou Rien', '200', '2015', 'Rap', 'Base', 'Platinum', 25, 18);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Sur Paname', '250', '2015', 'Rap', 'HD', 'Platinum', 35, 18);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'White Iverson', '210', '2016', 'Rap', 'Base', 'Platinum', 25, 19);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Feel', '230', '2016', 'Rap', 'Base', 'Platinum', 10, 19);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Cold', '200', '2016', 'Rap', 'Ultra HD', 'Studenti', 35, 19);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Vero', '210', '2016', 'Rap', 'Base', 'Standard', 15, 20);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Fuori Orario', '300', '2016', 'Rap', 'Ultra HD', 'Standard', 10, 20);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Things About Things', '255', '2022', 'Indie', 'HD', 'Gold', 21);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Try Me', '350', '2022', 'Indie', 'HD', 'Gold', 21);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'El Coche', '180', '2015', 'Raeggeton', 'Base', 'Studenti', 22);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'Gianni Agnelli', '360', '2015', 'Raeggeton', 'Ultra HD', 'Studenti', 22);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'XDVR', '270', '2015', 'Rap', 'Base', 'Standard', 20, 35);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Brutti Sogni', '180', '2015', 'Rap', 'Base', 'Standard', 15, 35);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Balenciaga', '200', '2016', 'Rap', 'HD', 'Platinum', 20, 36);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'BHMG', '190', '2016', 'Rap', 'HD', 'Platinum', 15, 36);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'La Vida Tombola', '210', '2007', 'Indie', 'Ultra HD', 'Platinum', 39);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, accesso, album)
 values(nextval('codtraccia'), 'La Mano De Dios', '210', '2000', 'Pop', 'HD', 'Platinum', 40);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, tipo, accesso, album)
 values(nextval('codtraccia'), 'I Will Always Love You', '250', '1994', 'Pop', 'Ultra HD', 'Cover', 'Platinum', 23);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'I Will Always Love You', '250', '1974', 'Pop', 'HD', 'Original', 'Gold', 35, 24);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'All Along The Watchtower', '280', '1968', 'Rock', 'HD' , 'Cover', 'Gold', 0, 25);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'All Along The Watchtower', '280', '1967', 'Rock', 'Base', 'Original', 'Standard', 40, 26);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'The Man Who Sold The World', '260', '1993', 'Rock', 1, 'Ultra HD', 'Cover', 'Standard', 60, 27);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'The Man Who Sold The World', '260', '1970', 'Rock', 1, 'HD', 'Original', 'Standard', 10, 28);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'The Man Who Sold The World', '260', '2015', 'Rock', 2, 'Ultra HD', 'Remaster', 'Gold', 15, 29);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Don''t Let Me Be Misunderstood', '490', '2003', 'Pop', 1, 'HD', 'Cover', 'Gold', 25, 30);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Don''t Let Me Be Misunderstood', '490', '1694', 'Blues', 1, 'Base', 'Original', 'Standard', 90, 31);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Twist and Shout', '300', '1963', 'Rock', 1, 'HD', 'Cover', 'Gold', 50, 32);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Twist and Shout', '300', '2009', 'Rock', 2, 'Ultra HD', 'Remaster', 'Platinum', 35, 33);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, album)
 values(nextval('codtraccia'), 'Twist And Shout', '300', '1962', 'Rock', 1, 'Base', 'Original', 'Standard', 34);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Keep on Movin', '220', '1984', 'Blues', 1, 'HD', 'Original', 'Gold', 35, 37);
 
-insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitàaudio, tipo, accesso, percentualeprod, album)
+insert into traccia (IdTraccia, titolo, durata, anno, genere, versione, qualitaaudio, tipo, accesso, percentualeprod, album)
 values(nextval('codtraccia'), 'Keep on Movin', '220', '2021', 'Blues', 2, 'Ultra HD', 'Remaster', 'Platinum', 25, 38);
 
 
@@ -2129,7 +2129,7 @@ RETURN NEW;
 END
 $$ LANGUAGE PLPGSQL;
 
-CREATE TRIGGER controllo_unicità_album
+CREATE TRIGGER controllo_unicita_album
 AFTER INSERT ON artistaalbum
 FOR EACH ROW
 EXECUTE PROCEDURE check_album();
@@ -2442,12 +2442,12 @@ RETURNS table(
 	titolo traccia.titolo%TYPE,
 	anno traccia.anno%TYPE,
 	genere traccia.genere%TYPE,
-	qualitàaudio traccia.qualitàaudio%TYPE) LANGUAGE PLPGSQL
+	qualitaaudio traccia.qualitaaudio%TYPE) LANGUAGE PLPGSQL
 	AS $$
 DECLARE
 	apici varchar:=chr(39);
 	tipo utente.piano%TYPE;
-	sql_dinamico varchar(2000):='SELECT tr.idtraccia, tr.titolo, tr.anno, tr.genere, tr.qualitàaudio FROM traccia as tr WHERE (tr.accesso='||apici||'Standard'||apici||' ';
+	sql_dinamico varchar(2000):='SELECT tr.idtraccia, tr.titolo, tr.anno, tr.genere, tr.qualitaaudio FROM traccia as tr WHERE (tr.accesso='||apici||'Standard'||apici||' ';
 BEGIN
 	--Prendiamo il piano che è associato ad un utente.
 	SELECT ut.piano
@@ -3051,7 +3051,7 @@ $$ LANGUAGE PLPGSQL;
 CREATE OR REPLACE PROCEDURE inserimento_traccia(nickname_admin utente.nomeutente%TYPE, 
 pass utente.password%TYPE,codice_artista artista.idartista%TYPE, nome_album album.titolo%TYPE, 
 nome_traccia traccia.titolo%TYPE, durata_traccia traccia.durata%TYPE, 
-genere_traccia traccia.genere%TYPE, qualità traccia.qualitàaudio%TYPE,tipo_traccia traccia.tipo%TYPE, accesso_traccia traccia.accesso%TYPE, 
+genere_traccia traccia.genere%TYPE, qualita traccia.qualitaaudio%TYPE,tipo_traccia traccia.tipo%TYPE, accesso_traccia traccia.accesso%TYPE, 
 percentualeproduttore traccia.percentualeprod%TYPE, codice_traccia_originale traccia.idtraccia%TYPE DEFAULT NULL) AS $$
 DECLARE
 anno_pubblicazione album.anno%TYPE;
@@ -3083,7 +3083,7 @@ versione_traccia:=trova_versione(tipo_traccia,codice_traccia_originale,codice_ar
 --Andiamo a modellare la nostra istruzione di inserimento.
 sql_dinamico:='insert into traccia values(nextval('||apici||'codtraccia'||apici||'),'||apici||nome_traccia||apici||','||apici||durata_traccia||apici||','||apici||
 anno_pubblicazione||apici||','||apici||genere_traccia||apici||','||versione_traccia||','||apici||
-qualità||apici||','||apici||tipo_traccia||apici||','||apici||accesso_traccia||apici||','||apici||
+qualita||apici||','||apici||tipo_traccia||apici||','||apici||accesso_traccia||apici||','||apici||
 percentualeproduttore||apici||','||cod_album||');';
 
 --Modelliamo una seconda istruzione di inserimento che riguarderà la tabella tracciaartista.
@@ -3336,7 +3336,7 @@ $$;
 
 
 --Questa procedura ci consente di modificare la qualità audio di una determinata traccia.
-CREATE OR REPLACE PROCEDURE modifica_qualità_traccia(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE, nuova_qualità traccia.qualitàaudio%TYPE)
+CREATE OR REPLACE PROCEDURE modifica_qualità_traccia(nickname_admin utente.nomeutente%TYPE, pass utente.password%TYPE, codice_traccia traccia.idtraccia%TYPE, nuova_qualita traccia.qualitaaudio%TYPE)
 LANGUAGE plpgsql AS $$
 DECLARE 
 sql_dinamico varchar(1000);
@@ -3357,12 +3357,12 @@ IF brano IS NULL THEN
 END IF;
 
 --Facciamo un ulteriore controllo per vedere se la qualità attuale è uguale alla qualità che si vorrebbe apportare
-IF LOWER(brano.qualitàaudio)=LOWER(nuova_qualità) THEN
+IF LOWER(brano.qualitaaudio)=LOWER(nuova_qualita) THEN
 	RAISE EXCEPTION USING ERRCODE='NA132';
 END IF;
 	
 --Modelliamo la nostra istruzione di modifica.
-sql_dinamico = 'update traccia set qualitàaudio = '|| apice || nuova_qualità || apice || 
+sql_dinamico = 'update traccia set qualitaaudio = '|| apice || nuova_qualita || apice || 
 				'where idtraccia = ' || apice || codice_traccia || apice || ';';
 
 EXECUTE sql_dinamico;
