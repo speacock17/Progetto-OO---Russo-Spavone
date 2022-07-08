@@ -10,7 +10,7 @@ public class Traccia
 	private int Anno;
 	private String Genere;
 	private int Versione;
-	private String QualitàAudio;
+	private String QualitaAudio;
 	private String Tipo;
 	private String Accesso;
 	private int PercentualeProd;
@@ -44,7 +44,7 @@ public class Traccia
 		setArtistaPresente(null);
 	}
 	
-	public Traccia(int idTraccia, String titolo, int durata, int anno, String genere, int versione, String qualitàAudio,
+	public Traccia(int idTraccia, String titolo, int durata, int anno, String genere, int versione, String qualitaAudio,
 			String tipo, String accesso, int percentualeProd, ArrayList<Riproduzione> tracciaRiprodotta,
 			ArrayList<Utente> utenteAggiungiPreferiti, ArrayList<Traccia> tracciaDerivata, Album albumAppartenenza,
 			ArrayList<Artista> artistaCompositore, ArrayList<Artista> artistaPresente) 
@@ -106,7 +106,7 @@ public class Traccia
 		System.out.println("Anno: "+getAnno());
 		System.out.println("Genere: "+getGenere());
 		System.out.println("Versione: "+getVersione());
-		System.out.println("Qualità Audio: "+getQualitàAudio());
+		System.out.println("Qualità Audio: "+getQualitaAudio());
 		System.out.println("Tipo: "+getTipo());
 		System.out.println("Accesso: "+getAccesso());
 		System.out.println("Percentuale Produttore:: "+getPercentualeProd());
@@ -202,14 +202,14 @@ public class Traccia
 		this.Versione = versione;
 	}
 	
-	public String getQualitàAudio() 
+	public String getQualitaAudio() 
 	{
 		return QualitàAudio;
 	}
 	
-	private void setQualitàAudio(String qualitàAudio) 
+	private void setQualitaAudio(String qualitaAudio) 
 	{
-		this.QualitàAudio = qualitàAudio;
+		this.QualitaAudio = qualitaAudio;
 	}
 	
 	public String getTipo() 
