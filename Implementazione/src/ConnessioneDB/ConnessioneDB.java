@@ -10,7 +10,7 @@ public class ConnessioneDB
 	private static ConnessioneDB instance;
 	private Connection connection = null;
 	private String nome = "postgres";
-	private String password = "samsunggalaxys";
+	private String password = "test1";
 	private String url = "jdbc:postgresql://localhost:5432/oo-music";
 	
 	public ConnessioneDB() throws SQLException
