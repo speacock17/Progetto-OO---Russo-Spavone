@@ -2689,15 +2689,6 @@ BEGIN
 	call controllo_esistenza_traccia(codice_traccia);
 	
 	--Controllo se la traccia è stata mai ascoltata.
-	SELECT COUNT(*)
-	INTO contatore
-	FROM ascolti_utente AS au
-	WHERE au.idtraccia=codice_traccia;
-	
-	IF contatore=0 THEN
-			RAISE EXCEPTION USING ERRCODE='NA115';
-	END IF;
-
 
 	RETURN QUERY(SELECT *
 				 FROM ascolti_utente AS au
@@ -2708,11 +2699,7 @@ BEGIN
 				 AND au.idtraccia IN (SELECT *
 									 FROM visualizza_derivate(codice_traccia,codice_artista)));
 				
-	
-EXCEPTION
-WHEN SQLSTATE 'NA115' THEN
-	RAISE NOTICE 'Traccia mai ascoltata.';
-	ROLLBACK;
+
 END
 $$; 
 
