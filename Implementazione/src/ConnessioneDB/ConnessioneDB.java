@@ -10,8 +10,8 @@ public class ConnessioneDB
 	private static ConnessioneDB instance;
 	private Connection connection = null;
 	private String nome = "postgres";
-	private String password = "Napoli1926";
-	private String url = "jdbc:postgresql://localhost:5432/Prova3";
+	private String password = "password";
+	private String url = "jdbc:postgresql://localhost:5432/Prova";
 	
 	public ConnessioneDB() throws SQLException
 	{
