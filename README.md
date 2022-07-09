@@ -13,7 +13,7 @@ ISTRUZIONI DATABASE:
   
   -Sarà necessario modificare la variabile Password all'interno della classe java ConnessioneDB, inserendo la   propria per effettuare la connessione al server di pgAdmin.
   
- Per eventuale testing:
+ PER EVENTUALI TESTING:
  
  
  Client:
@@ -21,7 +21,7 @@ ISTRUZIONI DATABASE:
  -Registrazione
  
  
- Admin
+ Admin:
 
     -nome utente: tramontana00
     -password: insigne24
