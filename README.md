@@ -9,8 +9,15 @@ ISTRUZIONI DATABASE:
   
  Per eventuale testing:
  Client:
-    -Registrazione
+ 
+ 
+ -Registrazione
+ 
+ 
  Admin
+ 
+ 
+ 
     -nome utente: tramontana00
     -password: insigne24
     
