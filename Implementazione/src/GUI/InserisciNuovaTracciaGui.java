@@ -89,7 +89,7 @@ public class InserisciNuovaTracciaGui extends JFrame
 		inserimentoGenereTraccia.setBounds(470, 185, 250, 45);
 		contentPane.add(inserimentoGenereTraccia);
 		
-		JLabel EtichettaQualita = new JLabel("Qualita'†:");
+		JLabel EtichettaQualita = new JLabel("Qualita':");
 		EtichettaQualita.setForeground(new Color(255,255,255));
 		EtichettaQualita.setFont(new Font("Courier", Font.CENTER_BASELINE, 20));
 		EtichettaQualita.setBounds(300, 235, 350, 45);
@@ -164,7 +164,7 @@ public class InserisciNuovaTracciaGui extends JFrame
 				}
 				else if(inserimentoQualitaTraccia.getText().length()<=0 || inserimentoQualitaTraccia.getText().length()>20)
 				{
-					JOptionPane.showMessageDialog(avanzaInserimento,"Errore nell'inserimento della Qualita'†.");
+					JOptionPane.showMessageDialog(avanzaInserimento,"Errore nell'inserimento della Qualita'.");
 				}
 				else if(perc<0)
 				{
@@ -253,7 +253,7 @@ public class InserisciNuovaTracciaGui extends JFrame
 		inserimentoGenereTraccia.setBounds(470, 185, 250, 45);
 		contentPane.add(inserimentoGenereTraccia);
 		
-		JLabel EtichettaQualita = new JLabel("Qualita'†:");
+		JLabel EtichettaQualita = new JLabel("Qualita'¬†:");
 		EtichettaQualita.setForeground(new Color(255,255,255));
 		EtichettaQualita.setFont(new Font("Courier", Font.CENTER_BASELINE, 20));
 		EtichettaQualita.setBounds(300, 235, 350, 45);
@@ -337,7 +337,7 @@ public class InserisciNuovaTracciaGui extends JFrame
 				}
 				else if(inserimentoQualitaTraccia.getText().length()<=0 || inserimentoQualitaTraccia.getText().length()>20)
 				{
-					JOptionPane.showMessageDialog(avanzaInserimento,"Errore nell'inserimento della Qualit√†.");
+					JOptionPane.showMessageDialog(avanzaInserimento,"Errore nell'inserimento della Qualit√É¬†.");
 				}
 				else if(perc<0)
 				{
