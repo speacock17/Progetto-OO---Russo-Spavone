@@ -2687,8 +2687,6 @@ BEGIN
 
 	--Controllo se la traccia esiste.
 	call controllo_esistenza_traccia(codice_traccia);
-	
-	--Controllo se la traccia è stata mai ascoltata.
 
 	RETURN QUERY(SELECT *
 				 FROM ascolti_utente AS au
@@ -2698,8 +2696,6 @@ BEGIN
 														FROM visualizza_derivate(codice_traccia,codice_artista)))
 				 AND au.idtraccia IN (SELECT *
 									 FROM visualizza_derivate(codice_traccia,codice_artista)));
-				
-
 END
 $$; 
 
