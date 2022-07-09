@@ -1,11 +1,18 @@
 # Progetto-OO---Russo-Spavone
 
-Istruzioni creazione database:
-  -Nome database: Prova
-  -Password pgadmin: Napoli1926 o in alternativa modificare il campo password all'interno di ConnessioneDB
+-Per il funzionamento ottimale dell'applicativo è necessario importare il database in postgre
+
+ISTRUZIONI DATABASE:
+  -All'interno della cartella DB del GitHub vi è presente un file di testo con tutte le operazioni necessarie   per la costruzione e il funzionamento
+  -Nome Database: Prova
+  -Sarà necessario modificare la variabile Password all'interno della classe java ConnessioneDB, inserendo la   propria per effettuare la connessione al server di pgAdmin.
   
- Creazione database:
-  -All'interno della cartella "DB" del suddetto Git vi è presente un file .txt contenente la definizione completa utile per un corretto funzionamento dell'applicativo.
-  
-  
- *** Ci scusiamo per l'inconveniente delle lettere accentate, purtroppo c'è stato un errore in fase di caricamento di una versione obsoleta ***
+ Per eventuale testing:
+ Client:
+    -Registrazione
+ Admin
+    -nome utente: tramontana00
+    -password: insigne24
+    
+    
+***Grafica ottimale su MacBook Air 13'' (1080x720)***
